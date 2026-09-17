@@ -163,6 +163,13 @@ img { max-width: 100%; display: block; }
   margin: 0; font-size: 0.78rem; line-height: 1.45; color: var(--texte-doux);
   padding: 8px 10px; border-radius: 8px; background: var(--surface-2);
 }
+/* Bloc repliable « Historique des versions » (champ "historique" de creations.js) */
+.historique { font-size: 0.82rem; border-top: 1px solid var(--bordure); padding-top: 8px; }
+.historique summary { cursor: pointer; color: var(--accent); font-weight: 600; }
+.historique__liste { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.historique__entete { display: flex; justify-content: space-between; gap: 8px; }
+.historique__entete span { color: var(--texte-doux); }
+.historique__version ul { margin: 4px 0 0; padding-left: 18px; color: var(--texte-doux); }
 .bouton--desactive { background: var(--surface-2); color: var(--texte-doux); pointer-events: none; }
 
 /* ---------- Divers ---------- */

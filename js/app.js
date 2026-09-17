@@ -46,6 +46,24 @@
     document.getElementById("annee").textContent = new Date().getFullYear();
   }
 
+  /**
+   * Construit le bloc repliable « Historique des versions ».
+   * Attend un tableau [{ version, date, changements: [...] }], le plus récent en premier.
+   */
+  function creerHistorique(historique) {
+    if (!Array.isArray(historique) || historique.length === 0) return "";
+    const versions = historique.map(v => `
+      <li class="historique__version">
+        <div class="historique__entete"><strong>v${echapper(v.version)}</strong><span>${formaterDate(v.date)}</span></div>
+        <ul>${(v.changements || []).map(ch => `<li>${echapper(ch)}</li>`).join("")}</ul>
+      </li>`).join("");
+    return `
+      <details class="historique">
+        <summary>Historique des versions</summary>
+        <ul class="historique__liste">${versions}</ul>
+      </details>`;
+  }
+
   /** Construit le HTML d'une carte de création. */
   function creerCarte(c) {
     const type = LIBELLES_TYPE[c.type] ? c.type : "logiciel";
@@ -80,6 +98,7 @@
           <div class="carte__infos">${infos}</div>
           ${bouton}
           ${c.note ? `<p class="carte__note">${echapper(c.note)}</p>` : ""}
+          ${creerHistorique(c.historique)}
         </div>
       </article>`;
   }

@@ -21,6 +21,10 @@
      taille: "12 Mo",
      image: "images/ma-creation.png",       // "" si pas d'image
      fichier: "telechargements/ma-creation.zip", // ou un lien externe (https://…)
+     historique: [                          // optionnel : versions, la plus récente EN PREMIER
+       { version: "1.1.0", date: "2026-10-01", changements: ["Nouveauté 1", "Correction 2"] },
+       { version: "1.0.0", date: "2026-09-17", changements: ["Première version"] }
+     ],
      note: ""                               // optionnel : message affiché sous le bouton
    },
    ========================================================================== */
@@ -51,6 +55,9 @@ const CREATIONS = [
     taille: "296 Ko",
     image: "images/optimeo.png",
     fichier: "telechargements/Optimeo-Installation-1.0.0.exe",
+    historique: [
+      { version: "1.0.0", date: "2026-09-17", changements: ["Première version publique"] }
+    ],
     note: "Logiciel non signé : dans Chrome, cliquez « Conserver » puis « Conserver quand même ». À l'ouverture, Windows peut afficher « Windows a protégé votre ordinateur » : cliquez « Informations complémentaires » puis « Exécuter quand même »."
   }
 ];
