@@ -1,0 +1,4 @@
+﻿# Fichiers système Windows/macOS à ne pas publier
+Thumbs.db
+desktop.ini
+.DS_Store

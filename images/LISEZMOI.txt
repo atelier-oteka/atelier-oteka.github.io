@@ -1,0 +1,2 @@
+Placez ici les images des créations (format 16:9 conseillé, ex. 1280x720, .png ou .jpg).
+Référencez-les dans js/creations.js via le champ image: "images/nom.png".

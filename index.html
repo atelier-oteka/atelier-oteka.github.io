@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<!--
+  index.html — Page unique du site de téléchargement.
+  Le contenu (liste des créations, nom du site) est défini dans js/creations.js.
+  L'affichage est généré par js/app.js. Aucune modification nécessaire ici
+  pour ajouter une création.
+-->
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>L'Atelier d'Oteka</title>
+  <meta name="description" content="Logiciels et jeux à télécharger gratuitement.">
+  <link rel="icon" type="image/svg+xml" href="images/logo.svg">
+  <link rel="apple-touch-icon" href="images/logo-512.png">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- En-tête : nom du site + navigation -->
+  <header class="entete">
+    <div class="conteneur entete__contenu">
+      <!-- Le nom est dans un <span> séparé : app.js le remplace sans effacer l'image -->
+      <a href="#" class="logo">
+        <img class="logo__image" src="images/logo.svg" alt="" width="32" height="32">
+        <span id="site-nom">L'Atelier d'Oteka</span>
+      </a>
+      <nav class="nav">
+        <a href="#creations">Créations</a>
+        <a href="#apropos">À propos</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- Bandeau d'accueil -->
+    <section class="hero">
+      <div class="conteneur">
+        <h1 id="site-titre">Mes logiciels et jeux</h1>
+        <p id="site-description" class="hero__texte">Téléchargez gratuitement mes créations.</p>
+      </div>
+    </section>
+
+    <!-- Liste des créations -->
+    <section id="creations" class="conteneur section">
+      <!-- Barre d'outils : filtres par type + recherche -->
+      <div class="outils">
+        <div class="filtres" role="tablist" aria-label="Filtrer par type">
+          <button class="filtre actif" data-filtre="tous">Tous <span class="compteur" data-compteur="tous">0</span></button>
+          <button class="filtre" data-filtre="logiciel">Logiciels <span class="compteur" data-compteur="logiciel">0</span></button>
+          <button class="filtre" data-filtre="jeu">Jeux <span class="compteur" data-compteur="jeu">0</span></button>
+        </div>
+        <input type="search" id="recherche" class="recherche" placeholder="Rechercher…" aria-label="Rechercher une création">
+      </div>
+
+      <!-- Grille remplie par app.js -->
+      <div id="grille" class="grille" aria-live="polite"></div>
+
+      <!-- Message affiché quand aucune création ne correspond -->
+      <p id="vide" class="vide" hidden>Aucune création pour le moment. Revenez bientôt !</p>
+    </section>
+
+    <!-- À propos -->
+    <section id="apropos" class="conteneur section apropos">
+      <h2>À propos</h2>
+      <p id="site-apropos">Je crée des logiciels et des jeux sur mon temps libre.</p>
+    </section>
+  </main>
+
+  <footer class="pied">
+    <div class="conteneur">
+      <p>© <span id="annee"></span> <span id="site-auteur">Franck</span></p>
+    </div>
+  </footer>
+
+  <!-- Ordre important : les données d'abord, puis le script d'affichage -->
+  <script src="js/creations.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
