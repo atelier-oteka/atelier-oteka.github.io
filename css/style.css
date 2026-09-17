@@ -154,6 +154,11 @@ img { max-width: 100%; display: block; }
   background: var(--accent); color: var(--accent-texte);
 }
 .bouton:hover { filter: brightness(1.1); }
+/* Message optionnel sous le bouton (champ "note" de creations.js) */
+.carte__note {
+  margin: 0; font-size: 0.78rem; line-height: 1.45; color: var(--texte-doux);
+  padding: 8px 10px; border-radius: 8px; background: var(--surface-2);
+}
 .bouton--desactive { background: var(--surface-2); color: var(--texte-doux); pointer-events: none; }
 
 /* ---------- Divers ---------- */

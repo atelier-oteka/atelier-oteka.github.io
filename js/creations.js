@@ -19,7 +19,8 @@
      plateforme: "Windows",                 // ex. "Windows", "Navigateur", "Android"
      taille: "12 Mo",
      image: "images/ma-creation.png",       // "" si pas d'image
-     fichier: "telechargements/ma-creation.zip"  // ou un lien externe (https://…)
+     fichier: "telechargements/ma-creation.zip", // ou un lien externe (https://…)
+     note: ""                               // optionnel : message affiché sous le bouton
    },
    ========================================================================== */
 
@@ -41,6 +42,7 @@ const CREATIONS = [
     plateforme: "Windows 10 / 11",
     taille: "296 Ko",
     image: "images/optimeo.png",
-    fichier: "telechargements/Optimeo-Installation-1.0.0.exe"
+    fichier: "telechargements/Optimeo-Installation-1.0.0.exe",
+    note: "Logiciel non signé : dans Chrome, cliquez « Conserver » puis « Conserver quand même ». À l'ouverture, Windows peut afficher « Windows a protégé votre ordinateur » : cliquez « Informations complémentaires » puis « Exécuter quand même »."
   }
 ];

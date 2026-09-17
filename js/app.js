@@ -76,6 +76,7 @@
           <p class="carte__desc">${echapper(c.description)}</p>
           <div class="carte__infos">${infos}</div>
           ${bouton}
+          ${c.note ? `<p class="carte__note">${echapper(c.note)}</p>` : ""}
         </div>
       </article>`;
   }
