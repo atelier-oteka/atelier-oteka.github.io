@@ -39,6 +39,24 @@ const SITE = {
 
 const CREATIONS = [
   {
+    titre: "Fluidoscope",
+    type: "logiciel",
+    description: "Comparateur visuel de fluidité. Il montre côte à côte, en animation, la différence réelle entre 24, 30, 60, 90, 120, 144, 165 et 240 FPS. Chaque piste affiche la même scène, mais à sa propre cadence.",
+    points: [
+      "3 scènes : panoramique, rotation et visée",
+      "Ralenti ×0,1 et traces pour voir le saut entre deux images",
+      "Simulation de saccades, pour comprendre le 1 % low",
+      "Temps par image, déplacement et ruban des images présentées",
+      "Aucune installation, aucune connexion : un seul fichier à lancer"
+    ],
+    date: "2026-09-17",
+    plateforme: "Windows 10 / 11",
+    taille: "14 Mo",
+    image: "images/fluidoscope.png",
+    fichier: "telechargements/Fluidoscope.exe",
+    note: "Le rendu passe par WebView2, déjà présent sur Windows 10 et 11. Logiciel non signé : dans Chrome, cliquez « Conserver » puis « Conserver quand même », et « Exécuter quand même » si Windows affiche un avertissement."
+  },
+  {
     titre: "Optimeo",
     type: "logiciel",
     description: "Rendez votre PC plus rapide en un clic. Optimeo analyse Windows, applique uniquement les réglages utiles et sans risque, puis vérifie que chaque correction a vraiment fonctionné. Tout est sauvegardé et annulable.",
