@@ -43,20 +43,32 @@ const CREATIONS = [
     type: "logiciel",
     description: "Rendez votre PC plus rapide en un clic. Optimeo analyse Windows, applique uniquement les réglages utiles et sans risque, puis vérifie que chaque correction a vraiment fonctionné. Tout est sauvegardé et annulable.",
     points: [
+      "Tableau de bord : note de santé du PC, gains possibles, matériel et recommandations",
       "« Tout optimiser » : nettoyage, démarrage allégé, réglages jeux et confidentialité",
       "Mises à jour des logiciels, des pilotes et de Windows",
       "Liste des logiciels et jeux installés, avec désinstallation vérifiée",
       "Point de restauration créé avant chaque modification",
       "Aucune fausse astuce : ni nettoyage du registre, ni Defender désactivé"
     ],
-    version: "1.0.0",
+    version: "1.1.1",
     date: "2026-09-17",
     plateforme: "Windows 10 / 11",
-    taille: "296 Ko",
+    taille: "305 Ko",
     image: "images/optimeo.png",
-    fichier: "telechargements/Optimeo-Installation-1.0.0.exe",
+    fichier: "telechargements/Optimeo-Installation-1.1.1.exe",
     historique: [
-      { version: "1.0.0", date: "2026-09-17", changements: ["Première version publique"] }
+      { version: "1.1.1", date: "2026-09-17", changements: [
+        "Correction d'une erreur au lancement lors de l'analyse automatique du tableau de bord"
+      ] },
+      { version: "1.1.0", date: "2026-09-17", changements: [
+        "Nouvelle interface : menu latéral avec icônes et compteurs",
+        "Tableau de bord : note de santé, gains possibles, matériel et recommandations, avec analyse au lancement",
+        "Pastilles d'état colorées, icônes de catégorie et listes plus lisibles",
+        "Recherche et listes déroulantes en thème sombre, messages pour les pages vides"
+      ] },
+      { version: "1.0.0", date: "2026-09-17", changements: [
+        "Première version : Tout optimiser avec vérification, rapport, mises à jour, logiciels et jeux, installateur"
+      ] }
     ],
     note: "Logiciel non signé : dans Chrome, cliquez « Conserver » puis « Conserver quand même ». À l'ouverture, Windows peut afficher « Windows a protégé votre ordinateur » : cliquez « Informations complémentaires » puis « Exécuter quand même »."
   }
