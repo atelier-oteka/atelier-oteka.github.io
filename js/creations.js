@@ -14,6 +14,7 @@
      titre: "Nom de la création",
      type: "logiciel",                      // "logiciel" ou "jeu"
      description: "Courte description.",
+     points: ["Point fort 1", "Point fort 2"], // optionnel : liste de points forts
      version: "1.0.0",
      date: "2026-09-17",                    // format AAAA-MM-JJ
      plateforme: "Windows",                 // ex. "Windows", "Navigateur", "Android"
@@ -36,7 +37,14 @@ const CREATIONS = [
   {
     titre: "Optimeo",
     type: "logiciel",
-    description: "Optimiseur pour Windows 10 / 11 : un bouton « Tout optimiser » analyse le PC, applique les corrections sans risque et vérifie chacune. Réglages sauvegardés et annulables.",
+    description: "Rendez votre PC plus rapide en un clic. Optimeo analyse Windows, applique uniquement les réglages utiles et sans risque, puis vérifie que chaque correction a vraiment fonctionné. Tout est sauvegardé et annulable.",
+    points: [
+      "« Tout optimiser » : nettoyage, démarrage allégé, réglages jeux et confidentialité",
+      "Mises à jour des logiciels, des pilotes et de Windows",
+      "Liste des logiciels et jeux installés, avec désinstallation vérifiée",
+      "Point de restauration créé avant chaque modification",
+      "Aucune fausse astuce : ni nettoyage du registre, ni Defender désactivé"
+    ],
     version: "1.0.0",
     date: "2026-09-17",
     plateforme: "Windows 10 / 11",

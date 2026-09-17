@@ -74,6 +74,9 @@
           <span class="badge badge--${type}">${LIBELLES_TYPE[type]}</span>
           <h3 class="carte__titre">${echapper(c.titre)}</h3>
           <p class="carte__desc">${echapper(c.description)}</p>
+          ${Array.isArray(c.points) && c.points.length
+            ? `<ul class="carte__points">${c.points.map(p => `<li>${echapper(p)}</li>`).join("")}</ul>`
+            : ""}
           <div class="carte__infos">${infos}</div>
           ${bouton}
           ${c.note ? `<p class="carte__note">${echapper(c.note)}</p>` : ""}

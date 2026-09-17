@@ -154,6 +154,10 @@ img { max-width: 100%; display: block; }
   background: var(--accent); color: var(--accent-texte);
 }
 .bouton:hover { filter: brightness(1.1); }
+/* Liste optionnelle de points forts (champ "points" de creations.js) */
+.carte__points { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 4px; font-size: 0.85rem; }
+.carte__points li { position: relative; padding-left: 18px; }
+.carte__points li::before { content: "✓"; position: absolute; left: 0; color: var(--jeu); font-weight: 700; }
 /* Message optionnel sous le bouton (champ "note" de creations.js) */
 .carte__note {
   margin: 0; font-size: 0.78rem; line-height: 1.45; color: var(--texte-doux);
