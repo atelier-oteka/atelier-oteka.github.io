@@ -49,11 +49,20 @@ const CREATIONS = [
       "Temps par image, déplacement et ruban des images présentées",
       "Aucune installation, aucune connexion : un seul fichier à lancer"
     ],
-    date: "2026-09-17",
+    version: "1.0.0",
+    date: "2026-09-18",
     plateforme: "Windows 10 / 11",
     taille: "14 Mo",
     image: "images/fluidoscope.png",
-    fichier: "telechargements/Fluidoscope.exe",
+    fichier: "telechargements/Fluidoscope-1.0.0.exe",
+    historique: [
+      { version: "1.0.0", date: "2026-09-18", changements: [
+        "Première version : 8 tranches de 24 à 240 FPS",
+        "Scènes Panoramique, Rotation et Visée",
+        "Traces, ralenti ×0,1, saccades simulées et ruban d'images",
+        "Mesure de la fréquence de l'écran au démarrage"
+      ] }
+    ],
     note: "Le rendu passe par WebView2, déjà présent sur Windows 10 et 11. Logiciel non signé : dans Chrome, cliquez « Conserver » puis « Conserver quand même », et « Exécuter quand même » si Windows affiche un avertissement."
   },
   {
