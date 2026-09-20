@@ -73,8 +73,11 @@
     </div>
   </footer>
 
-  <!-- Ordre important : les données d'abord, puis le script d'affichage -->
-  <script src="js/creations.js"></script>
-  <script src="js/app.js"></script>
+  <!-- Ordre important : les données d'abord, puis le script d'affichage.
+       Le ?v= force les navigateurs à recharger les scripts au lieu de servir
+       une version gardée en cache : CHANGER CETTE DATE à chaque publication,
+       sinon les visiteurs ne verront pas la nouvelle création. -->
+  <script src="js/creations.js?v=2026-09-20"></script>
+  <script src="js/app.js?v=2026-09-20"></script>
 </body>
 </html>
