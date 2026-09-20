@@ -43,22 +43,14 @@ const CREATIONS = [
   {
     titre: "Mainscope",
     type: "logiciel",
-    description: "Assistant de décision au Texas Hold'em, pour débutants. Vous donnez votre position, la profondeur de votre tapis et vos deux cartes : Mainscope répond par un seul ordre, ouvrir, se coucher, tapis, miser ou checker. Rien à calculer, aucun montant à saisir.",
+    description: "Assistant de décision au Texas Hold'em, pour débutants. Vous donnez votre position, votre tapis et vos deux cartes : Mainscope répond par un seul ordre — ouvrir, se coucher, tapis, miser ou checker. Rien à calculer, aucun montant à saisir.",
     points: [
       "Vrai installateur : raccourci sur le Bureau, désinstallation propre",
-      "Carnet : bankroll, historique des tournois, ROI et buy-in conseillé",
-      "Sauvegardes datées de votre carnet, restaurables en un clic",
-      "Deux modes : réduit pour jouer vite, complet pour analyser juste",
-      "Les 66 niveaux du Monster Stack Winamax embarqués : votre M et votre rang en découlent",
-      "24 tableaux d'ouverture : 6 positions × 4 profondeurs, choisies par votre nombre exact de grosses blindes",
-      "Tableaux de réaction quand quelqu'un a déjà misé : relancer ou suivre",
-      "À 15 BB et moins, l'ordre devient tapis ou fold",
-      "Tient compte du tapis moyen du tournoi, lu sur la table",
+      "Tableaux d'ouverture et de réaction : 6 positions, votre nombre exact de grosses blindes",
       "Après le flop : vos chances réelles contre le nombre d'adversaires indiqué",
-      "Vous dit quand vous n'avez rien de plus que le tableau",
-      "Tableau des mains 13 × 13, avec votre main entourée",
-      "Évaluateur exact, vérifié sur les équités de référence connues",
-      "Aucune installation, aucune connexion : un seul fichier à lancer"
+      "Les 66 niveaux du Monster Stack Winamax embarqués : votre M et votre rang en découlent",
+      "Carnet : bankroll, historique des tournois, ROI, sauvegardes restaurables",
+      "Deux modes : réduit pour jouer vite, complet pour analyser juste"
     ],
     version: "2.3.0",
     date: "2026-09-20",
@@ -125,7 +117,7 @@ const CREATIONS = [
         "Tableau des mains 13 × 13 et nom de la main en clair"
       ] }
     ],
-    note: "Conçu pour le tournoi 6 joueurs, format Monster Stack, en petites limites. L'installateur ne demande aucun droit administrateur et conserve vos données en cas de désinstallation. Logiciel non signé : dans Chrome, cliquez \u00ab Conserver \u00bb puis \u00ab Conserver quand meme \u00bb. À l'ouverture, Windows peut afficher \u00ab Windows a protégé votre ordinateur \u00bb : cliquez \u00ab Informations complementaires \u00bb puis \u00ab Executer quand meme \u00bb. Mainscope aide à décider, il ne garantit aucun gain."
+    note: "Conçu pour le tournoi 6 joueurs, format Monster Stack, en petites limites. L'installateur ne demande aucun droit administrateur et conserve vos données en cas de désinstallation. Mainscope aide à décider, il ne garantit aucun gain."
   },
   {
     titre: "Fluidoscope",
