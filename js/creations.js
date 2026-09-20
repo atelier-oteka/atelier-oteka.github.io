@@ -45,6 +45,9 @@ const CREATIONS = [
     type: "logiciel",
     description: "Assistant de décision au Texas Hold'em, pour débutants. Vous donnez votre position, la profondeur de votre tapis et vos deux cartes : Mainscope répond par un seul ordre, ouvrir, se coucher, tapis, miser ou checker. Rien à calculer, aucun montant à saisir.",
     points: [
+      "Vrai installateur : raccourci sur le Bureau, désinstallation propre",
+      "Carnet : bankroll, historique des tournois, ROI et buy-in conseillé",
+      "Sauvegardes datées de votre carnet, restaurables en un clic",
       "Deux modes : réduit pour jouer vite, complet pour analyser juste",
       "Les 66 niveaux du Monster Stack Winamax embarqués : vos BB et votre M sont calculés",
       "24 tableaux d'ouverture : 6 positions × 4 paliers de tapis, réglés en grosses blindes",
@@ -57,13 +60,20 @@ const CREATIONS = [
       "Évaluateur exact, vérifié sur les équités de référence connues",
       "Aucune installation, aucune connexion : un seul fichier à lancer"
     ],
-    version: "1.4.0",
+    version: "2.0.0",
     date: "2026-09-20",
     plateforme: "Windows 10 / 11",
-    taille: "6,5 Mo",
+    taille: "8,6 Mo",
     image: "images/mainscope-1.0.0.png",
-    fichier: "telechargements/Mainscope-1.4.0.exe",
+    fichier: "telechargements/Mainscope-Installation-2.0.0.exe",
     historique: [
+      { version: "2.0.0", date: "2026-09-20", changements: [
+        "Vrai installateur Windows : raccourci sur le Bureau et dans le menu Démarrer, désinstallation propre",
+        "Carnet de tournoi : bankroll, historique, ROI, part de tournois dans les places, buy-in conseillé",
+        "Sauvegardes datées du carnet dans un fichier, restaurables depuis le logiciel",
+        "La bulle entre dans le calcul : la prime de survie monte à l'approche des places payées",
+        "Barre d'état permanente et ouverture en plein écran"
+      ] },
       { version: "1.4.0", date: "2026-09-20", changements: [
         "Les 66 niveaux du Monster Stack Winamax sont embarqués, blindes et antes",
         "Votre tapis en grosses blindes est calculé : niveau + jetons, plus d'estimation",
@@ -98,7 +108,7 @@ const CREATIONS = [
         "Tableau des mains 13 × 13 et nom de la main en clair"
       ] }
     ],
-    note: "Conçu pour le tournoi 6 joueurs, format Monster Stack, en petites limites. Logiciel non signé : dans Chrome, cliquez \u00ab Conserver \u00bb puis \u00ab Conserver quand meme \u00bb. À l'ouverture, Windows peut afficher \u00ab Windows a protégé votre ordinateur \u00bb : cliquez \u00ab Informations complementaires \u00bb puis \u00ab Executer quand meme \u00bb. Mainscope aide à décider, il ne garantit aucun gain."
+    note: "Conçu pour le tournoi 6 joueurs, format Monster Stack, en petites limites. L'installateur ne demande aucun droit administrateur et conserve vos données en cas de désinstallation. Logiciel non signé : dans Chrome, cliquez \u00ab Conserver \u00bb puis \u00ab Conserver quand meme \u00bb. À l'ouverture, Windows peut afficher \u00ab Windows a protégé votre ordinateur \u00bb : cliquez \u00ab Informations complementaires \u00bb puis \u00ab Executer quand meme \u00bb. Mainscope aide à décider, il ne garantit aucun gain."
   },
   {
     titre: "Fluidoscope",
