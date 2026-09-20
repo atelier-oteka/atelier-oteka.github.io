@@ -45,21 +45,29 @@ const CREATIONS = [
     type: "logiciel",
     description: "Assistant de décision au Texas Hold'em, pour débutants. Vous donnez votre position, la profondeur de votre tapis et vos deux cartes : Mainscope répond par un seul ordre, ouvrir, se coucher, tapis, miser ou checker. Rien à calculer, aucun montant à saisir.",
     points: [
-      "15 tableaux d'ouverture : 5 positions × 3 profondeurs de tapis",
+      "18 tableaux d'ouverture : 6 positions × 3 profondeurs de tapis",
+      "Tableaux de réaction quand quelqu'un a déjà misé : relancer ou suivre",
       "Sous 20 BB, l'ordre devient tapis ou rien",
-      "Après le flop : vos chances réelles de gagner, contre des mains inconnues",
-      "Nomme votre main en clair : paire de rois, double paire, quinte flush",
+      "Après le flop : vos chances réelles contre le nombre d'adversaires indiqué",
+      "Vous dit quand vous n'avez rien de plus que le tableau",
       "Tableau des mains 13 × 13, avec votre main entourée",
       "Évaluateur exact, vérifié sur les équités de référence connues",
       "Aucune installation, aucune connexion : un seul fichier à lancer"
     ],
-    version: "1.0.0",
+    version: "1.1.0",
     date: "2026-09-20",
     plateforme: "Windows 10 / 11",
     taille: "6,5 Mo",
     image: "images/mainscope-1.0.0.png",
-    fichier: "telechargements/Mainscope-1.0.0.exe",
+    fichier: "telechargements/Mainscope-1.1.0.exe",
     historique: [
+      { version: "1.1.0", date: "2026-09-20", changements: [
+        "Une paire au tableau n'est plus annoncée comme la vôtre",
+        "L'équité correspond à votre situation : vous indiquez le nombre d'adversaires",
+        "Plus d'action impossible : un réglage distingue ouverture, mise et relance",
+        "Tableaux de réaction, position BB, et tapis après le flop à tapis court",
+        "Précision triplée : 60 000 tirages, erreur type d'environ 0,2 point"
+      ] },
       { version: "1.0.0", date: "2026-09-20", changements: [
         "Première version : verdict préflop par tableau, verdict postflop par simulation",
         "15 tableaux d'ouverture selon la position et la profondeur de tapis",
