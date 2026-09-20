@@ -19,7 +19,9 @@
      date: "2026-09-17",                    // format AAAA-MM-JJ
      plateforme: "Windows",                 // ex. "Windows", "Navigateur", "Android"
      taille: "12 Mo",
-     image: "images/ma-creation.png",       // "" si pas d'image
+     image: "images/ma-creation.png?v=2026-09-20", // "" si pas d'image ;
+                                            // le ?v= evite qu'un navigateur ressorte
+                                            // une ancienne image gardee en cache
      fichier: "telechargements/ma-creation.zip", // ou un lien externe (https://…)
      historique: [                          // optionnel : versions, la plus récente EN PREMIER
        { version: "1.1.0", date: "2026-10-01", changements: ["Nouveauté 1", "Correction 2"] },
@@ -55,7 +57,7 @@ const CREATIONS = [
     date: "2026-09-20",
     plateforme: "Windows 10 / 11",
     taille: "6,5 Mo",
-    image: "images/mainscope.png",
+    image: "images/mainscope.png?v=2026-09-20",
     fichier: "telechargements/Mainscope-1.0.0.exe",
     historique: [
       { version: "1.0.0", date: "2026-09-20", changements: [
