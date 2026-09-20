@@ -45,22 +45,30 @@ const CREATIONS = [
     type: "logiciel",
     description: "Assistant de décision au Texas Hold'em, pour débutants. Vous donnez votre position, la profondeur de votre tapis et vos deux cartes : Mainscope répond par un seul ordre, ouvrir, se coucher, tapis, miser ou checker. Rien à calculer, aucun montant à saisir.",
     points: [
-      "18 tableaux d'ouverture : 6 positions × 3 profondeurs de tapis",
+      "24 tableaux d'ouverture : 6 positions × 4 paliers de tapis, réglés en grosses blindes",
       "Tableaux de réaction quand quelqu'un a déjà misé : relancer ou suivre",
-      "Sous 20 BB, l'ordre devient tapis ou rien",
+      "À 15 BB et moins, l'ordre devient tapis ou fold",
+      "Tient compte de votre tapis face au tapis moyen du tournoi",
       "Après le flop : vos chances réelles contre le nombre d'adversaires indiqué",
       "Vous dit quand vous n'avez rien de plus que le tableau",
       "Tableau des mains 13 × 13, avec votre main entourée",
       "Évaluateur exact, vérifié sur les équités de référence connues",
       "Aucune installation, aucune connexion : un seul fichier à lancer"
     ],
-    version: "1.1.0",
+    version: "1.2.0",
     date: "2026-09-20",
     plateforme: "Windows 10 / 11",
     taille: "6,5 Mo",
     image: "images/mainscope-1.0.0.png",
-    fichier: "telechargements/Mainscope-1.1.0.exe",
+    fichier: "telechargements/Mainscope-1.2.0.exe",
     historique: [
+      { version: "1.2.0", date: "2026-09-20", changements: [
+        "Le tapis se règle en grosses blindes, de 6 à 100+, au lieu de trois paliers",
+        "Un quatrième tableau, plus large, quand le tapis est à bout de course",
+        "Tapis ou fold à 15 BB et moins ; entre 11 et 15 BB, suivre reste suivre",
+        "Nouveau réglage : votre tapis face au tapis moyen du tournoi",
+        "Prime de survie progressive selon le nombre de blindes restantes"
+      ] },
       { version: "1.1.0", date: "2026-09-20", changements: [
         "Une paire au tableau n'est plus annoncée comme la vôtre",
         "L'équité correspond à votre situation : vous indiquez le nombre d'adversaires",
