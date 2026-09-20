@@ -53,20 +53,25 @@ const CREATIONS = [
       "24 tableaux d'ouverture : 6 positions × 4 paliers de tapis, réglés en grosses blindes",
       "Tableaux de réaction quand quelqu'un a déjà misé : relancer ou suivre",
       "À 15 BB et moins, l'ordre devient tapis ou fold",
-      "Tient compte de votre tapis face au tapis moyen du tournoi",
+      "Tient compte du tapis moyen du tournoi, lu sur la table",
       "Après le flop : vos chances réelles contre le nombre d'adversaires indiqué",
       "Vous dit quand vous n'avez rien de plus que le tableau",
       "Tableau des mains 13 × 13, avec votre main entourée",
       "Évaluateur exact, vérifié sur les équités de référence connues",
       "Aucune installation, aucune connexion : un seul fichier à lancer"
     ],
-    version: "2.0.0",
+    version: "2.1.0",
     date: "2026-09-20",
     plateforme: "Windows 10 / 11",
-    taille: "8,6 Mo",
+    taille: "8,2 Mo",
     image: "images/mainscope-1.0.0.png",
-    fichier: "telechargements/Mainscope-Installation-2.0.0.exe",
+    fichier: "telechargements/Mainscope-Installation-2.1.0.exe",
     historique: [
+      { version: "2.1.0", date: "2026-09-20", changements: [
+        "Les couleurs se choisissent : un clic sur une carte de votre main fait tourner son enseigne, les deux cartes suivent ensemble sur une main assortie",
+        "Le tapis moyen du tournoi se lit sur la table et se saisit en jetons, au lieu d'être estimé de travers",
+        "Le champ Entrants disparaît : le nombre de joueurs restants suffit"
+      ] },
       { version: "2.0.0", date: "2026-09-20", changements: [
         "Vrai installateur Windows : raccourci sur le Bureau et dans le menu Démarrer, désinstallation propre",
         "Carnet de tournoi : bankroll, historique, ROI, part de tournois dans les places, buy-in conseillé",
