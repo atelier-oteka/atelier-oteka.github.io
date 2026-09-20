@@ -60,15 +60,19 @@ const CREATIONS = [
       "Évaluateur exact, vérifié sur les équités de référence connues",
       "Aucune installation, aucune connexion : un seul fichier à lancer"
     ],
-    version: "2.1.0",
+    version: "2.1.1",
     date: "2026-09-20",
     plateforme: "Windows 10 / 11",
-    taille: "8,2 Mo",
+    taille: "8,1 Mo",
     image: "images/mainscope-1.0.0.png",
-    fichier: "telechargements/Mainscope-Installation-2.1.0.exe",
+    fichier: "telechargements/Mainscope-Installation-2.1.1.exe",
     historique: [
+      { version: "2.1.1", date: "2026-09-20", changements: [
+        "Les quatre couleurs sont accessibles sur chaque carte : le clic fait tourner l'enseigne de la carte cliquée, et le tableau 13 × 13 suit",
+        "Quand l'enregistrement tardif est fermé, les deux cases de la seconde chance sont grisées : la question ne se pose plus"
+      ] },
       { version: "2.1.0", date: "2026-09-20", changements: [
-        "Les couleurs se choisissent : un clic sur une carte de votre main fait tourner son enseigne, les deux cartes suivent ensemble sur une main assortie",
+        "Les couleurs se choisissent : un clic sur une carte de votre main fait tourner son enseigne",
         "Le tapis moyen du tournoi se lit sur la table et se saisit en jetons, au lieu d'être estimé de travers",
         "Le champ Entrants disparaît : le nombre de joueurs restants suffit"
       ] },
