@@ -39,6 +39,35 @@ const SITE = {
 
 const CREATIONS = [
   {
+    titre: "Mainscope",
+    type: "logiciel",
+    description: "Assistant de décision au Texas Hold'em, pour débutants. Vous donnez votre position, la profondeur de votre tapis et vos deux cartes : Mainscope répond par un seul ordre, ouvrir, se coucher, tapis, miser ou checker. Rien à calculer, aucun montant à saisir.",
+    points: [
+      "15 tableaux d'ouverture : 5 positions × 3 profondeurs de tapis",
+      "Sous 20 BB, l'ordre devient tapis ou rien",
+      "Après le flop : vos chances réelles de gagner, contre des mains inconnues",
+      "Nomme votre main en clair : paire de rois, double paire, quinte flush",
+      "Tableau des mains 13 × 13, avec votre main entourée",
+      "Évaluateur exact, vérifié sur les équités de référence connues",
+      "Aucune installation, aucune connexion : un seul fichier à lancer"
+    ],
+    version: "1.0.0",
+    date: "2026-09-20",
+    plateforme: "Windows 10 / 11",
+    taille: "6,5 Mo",
+    image: "images/mainscope.png",
+    fichier: "telechargements/Mainscope-1.0.0.exe",
+    historique: [
+      { version: "1.0.0", date: "2026-09-20", changements: [
+        "Première version : verdict préflop par tableau, verdict postflop par simulation",
+        "15 tableaux d'ouverture selon la position et la profondeur de tapis",
+        "Prime de survie : les seuils montent quand le tapis baisse",
+        "Tableau des mains 13 × 13 et nom de la main en clair"
+      ] }
+    ],
+    note: "Conçu pour le tournoi 6 joueurs, format Monster Stack, en petites limites. Logiciel non signé : dans Chrome, cliquez \u00ab Conserver \u00bb puis \u00ab Conserver quand meme \u00bb. À l'ouverture, Windows peut afficher \u00ab Windows a protégé votre ordinateur \u00bb : cliquez \u00ab Informations complementaires \u00bb puis \u00ab Executer quand meme \u00bb. Mainscope aide à décider, il ne garantit aucun gain."
+  },
+  {
     titre: "Fluidoscope",
     type: "logiciel",
     description: "Comparateur visuel de fluidité. Il montre côte à côte, en animation, la différence réelle entre 24, 30, 60, 90, 120, 144, 165 et 240 FPS. Chaque piste affiche la même scène, mais à sa propre cadence.",
