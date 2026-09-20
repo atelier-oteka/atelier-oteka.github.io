@@ -50,7 +50,7 @@ const CREATIONS = [
       "Sauvegardes datées de votre carnet, restaurables en un clic",
       "Deux modes : réduit pour jouer vite, complet pour analyser juste",
       "Les 66 niveaux du Monster Stack Winamax embarqués : votre M et votre rang en découlent",
-      "24 tableaux d'ouverture : 6 positions × 4 paliers de tapis, réglés en grosses blindes",
+      "24 tableaux d'ouverture : 6 positions × 4 profondeurs, choisies par votre nombre exact de grosses blindes",
       "Tableaux de réaction quand quelqu'un a déjà misé : relancer ou suivre",
       "À 15 BB et moins, l'ordre devient tapis ou fold",
       "Tient compte du tapis moyen du tournoi, lu sur la table",
@@ -60,13 +60,17 @@ const CREATIONS = [
       "Évaluateur exact, vérifié sur les équités de référence connues",
       "Aucune installation, aucune connexion : un seul fichier à lancer"
     ],
-    version: "2.2.0",
+    version: "2.3.0",
     date: "2026-09-20",
     plateforme: "Windows 10 / 11",
     taille: "8,1 Mo",
     image: "images/mainscope-1.0.0.png",
-    fichier: "telechargements/Mainscope-Installation-2.2.0.exe",
+    fichier: "telechargements/Mainscope-Installation-2.3.0.exe",
     historique: [
+      { version: "2.3.0", date: "2026-09-20", changements: [
+        "Le tapis se donne au nombre exact de grosses blindes, au clavier ou d'un pas à la fois",
+        "Le mode réduit garde ses trois paliers ; passer d'un mode à l'autre reporte la valeur"
+      ] },
       { version: "2.2.0", date: "2026-09-20", changements: [
         "Le tapis ne se saisit plus qu'en grosses blindes : le champ en jetons faisait double emploi",
         "Le niveau du tournoi traduit le reste dans cette unité : votre M, votre rang face au tapis moyen"
