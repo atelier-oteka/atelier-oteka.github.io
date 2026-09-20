@@ -57,7 +57,7 @@ const CREATIONS = [
     date: "2026-09-20",
     plateforme: "Windows 10 / 11",
     taille: "6,5 Mo",
-    image: "images/mainscope.png?v=2026-09-20",
+    image: "images/mainscope-1.0.0.png",
     fichier: "telechargements/Mainscope-1.0.0.exe",
     historique: [
       { version: "1.0.0", date: "2026-09-20", changements: [
