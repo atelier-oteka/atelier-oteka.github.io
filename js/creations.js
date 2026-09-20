@@ -45,6 +45,7 @@ const CREATIONS = [
     type: "logiciel",
     description: "Assistant de décision au Texas Hold'em, pour débutants. Vous donnez votre position, la profondeur de votre tapis et vos deux cartes : Mainscope répond par un seul ordre, ouvrir, se coucher, tapis, miser ou checker. Rien à calculer, aucun montant à saisir.",
     points: [
+      "Deux modes : réduit pour jouer vite, complet pour analyser juste",
       "24 tableaux d'ouverture : 6 positions × 4 paliers de tapis, réglés en grosses blindes",
       "Tableaux de réaction quand quelqu'un a déjà misé : relancer ou suivre",
       "À 15 BB et moins, l'ordre devient tapis ou fold",
@@ -55,13 +56,19 @@ const CREATIONS = [
       "Évaluateur exact, vérifié sur les équités de référence connues",
       "Aucune installation, aucune connexion : un seul fichier à lancer"
     ],
-    version: "1.2.0",
+    version: "1.3.0",
     date: "2026-09-20",
     plateforme: "Windows 10 / 11",
     taille: "6,5 Mo",
     image: "images/mainscope-1.0.0.png",
-    fichier: "telechargements/Mainscope-1.2.0.exe",
+    fichier: "telechargements/Mainscope-1.3.0.exe",
     historique: [
+      { version: "1.3.0", date: "2026-09-20", changements: [
+        "Mode réduit : trois réglages seulement pour rester jouable en direct",
+        "Ce qui n'est plus demandé est supposé, et affiché à l'écran : aucune hypothèse cachée",
+        "Marge de prudence sur les seuils du mode réduit, et avertissement dans les cas limites",
+        "Bascule d'un mode à l'autre à tout moment, sans perdre ses réglages"
+      ] },
       { version: "1.2.0", date: "2026-09-20", changements: [
         "Le tapis se règle en grosses blindes, de 6 à 100+, au lieu de trois paliers",
         "Un quatrième tableau, plus large, quand le tapis est à bout de course",
