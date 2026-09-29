@@ -41,6 +41,29 @@ const SITE = {
 
 const CREATIONS = [
   {
+    titre: "Hold'Up",
+    type: "jeu",
+    description: "L'école du poker : apprenez le Texas Hold'em No Limit en jouant un tournoi Monster Stack de 100 joueurs contre des adversaires virtuels, avec un coach qui conseille et corrige chacune de vos décisions.",
+    points: [
+      "Vrai installateur : raccourci sur le Bureau, désinstallation propre, aucun droit administrateur",
+      "Tournoi Monster Stack de 100 joueurs (66 niveaux, 15 places payées) ou partie rapide à 6",
+      "Coach en trois modes (guidé, correction, silencieux), avec le bilan de chaque main",
+      "À la bulle, le coach et les adversaires tiennent compte des prix du tournoi (ICM)",
+      "Cinq styles d'adversaires, du Roc au Maniaque, qui ne voient jamais vos cartes",
+      "École : 3 chapitres, exercices, mini-examens et diplôme Fondations ; bankroll et statistiques"
+    ],
+    version: "0.5.0",
+    date: "2026-09-29",
+    plateforme: "Windows 10 / 11 (64 bits)",
+    taille: "44,5 Mo",
+    image: "images/holdup.png?v=2026-09-29",
+    fichier: "telechargements/HoldUp-Installation-0.5.0.exe",
+    historique: [
+      { version: "0.5.0", date: "2026-09-29", changements: ["Première version publiée : tournoi de 100 joueurs et partie rapide, coach, école (module 1 et diplôme Fondations), jeu à la bulle avec l'ICM"] }
+    ],
+    note: "Jeu hors ligne, sans argent réel : Hold'Up apprend à jouer, il ne garantit aucun gain. L'installateur ne demande aucun droit administrateur et conserve vos données (progression, bankroll) en cas de mise à jour ou de désinstallation. Logiciel non signé : dans Chrome, cliquez « Conserver » puis « Conserver quand même », et « Exécuter quand même » si Windows affiche un avertissement."
+  },
+  {
     titre: "Grind Poker",
     type: "logiciel",
     description: "Pour faire monter sa bankroll en tournois Winamax, en apprenant à décider juste et vite. Un suivi de bankroll qui fixe tout seul ta limite de buy-in, une école de poker, et une vraie table d'entraînement avec un chrono sur ton siège : l'objectif est de prendre la bonne décision en moins de 10 secondes.",
