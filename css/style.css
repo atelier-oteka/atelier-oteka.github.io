@@ -18,6 +18,10 @@
   --logiciel: #f5a524;      /* badge "Logiciel" */
   --rayon: 12px;
   --police: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  /* Halos du fond animé */
+  --halo-1: rgba(91, 140, 255, 0.35);   /* bleu (accent) */
+  --halo-2: rgba(168, 85, 247, 0.30);   /* violet */
+  --halo-3: rgba(236, 72, 153, 0.22);   /* rose */
 }
 
 /* ---------- Base ---------- */
@@ -30,16 +34,16 @@ body {
   font-family: var(--police);
   line-height: 1.6;
 }
+a { color: var(--accent); text-decoration: none; }
+img { max-width: 100%; display: block; }
+
+.conteneur { width: 100%; max-width: 1100px; margin: 0 auto; padding: 0 16px; }
+.section { padding: 48px 16px; }
 
 /* ---------- Fond d'écran animé (100 % CSS, aucune image) ----------
    ::before = halos de couleur flous qui dérivent lentement
    ::after  = grille fine qui s'estompe vers le bas
-   Couleurs modifiables via --halo-1/2/3. */
-:root {
-  --halo-1: rgba(91, 140, 255, 0.35);   /* bleu (accent) */
-  --halo-2: rgba(168, 85, 247, 0.30);   /* violet */
-  --halo-3: rgba(236, 72, 153, 0.22);   /* rose */
-}
+   Couleurs modifiables via --halo-1/2/3 dans :root. */
 body::before,
 body::after {
   content: "";
@@ -74,11 +78,6 @@ body::after {
 @media (prefers-reduced-motion: reduce) {
   body::before { animation: none; }
 }
-a { color: var(--accent); text-decoration: none; }
-img { max-width: 100%; display: block; }
-
-.conteneur { width: 100%; max-width: 1100px; margin: 0 auto; padding: 0 16px; }
-.section { padding: 48px 16px; }
 
 /* ---------- En-tête ---------- */
 .entete {
@@ -93,6 +92,7 @@ img { max-width: 100%; display: block; }
 .nav { display: flex; gap: 20px; }
 .nav a { color: var(--texte-doux); }
 .nav a:hover { color: var(--texte); }
+.logo, .nav a { white-space: nowrap; }
 
 /* ---------- Bandeau d'accueil ---------- */
 .hero { padding: 72px 0 24px; text-align: center; }
@@ -154,6 +154,12 @@ img { max-width: 100%; display: block; }
   background: var(--accent); color: var(--accent-texte);
 }
 .bouton:hover { filter: brightness(1.1); }
+.bouton--desactive { background: var(--surface-2); color: var(--texte-doux); pointer-events: none; }
+
+/* Bloc repliable « En savoir plus » : points forts, note, historique */
+.details { font-size: 0.85rem; }
+.details > summary { cursor: pointer; color: var(--accent); font-weight: 600; }
+.details__contenu { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
 /* Liste optionnelle de points forts (champ "points" de creations.js) */
 .carte__points { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 4px; font-size: 0.85rem; }
 .carte__points li { position: relative; padding-left: 18px; }
@@ -163,14 +169,13 @@ img { max-width: 100%; display: block; }
   margin: 0; font-size: 0.78rem; line-height: 1.45; color: var(--texte-doux);
   padding: 8px 10px; border-radius: 8px; background: var(--surface-2);
 }
-/* Bloc repliable « Historique des versions » (champ "historique" de creations.js) */
+/* Sous-bloc repliable « Historique des versions » (champ "historique") */
 .historique { font-size: 0.82rem; border-top: 1px solid var(--bordure); padding-top: 8px; }
 .historique summary { cursor: pointer; color: var(--accent); font-weight: 600; }
 .historique__liste { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
 .historique__entete { display: flex; justify-content: space-between; gap: 8px; }
 .historique__entete span { color: var(--texte-doux); }
 .historique__version ul { margin: 4px 0 0; padding-left: 18px; color: var(--texte-doux); }
-.bouton--desactive { background: var(--surface-2); color: var(--texte-doux); pointer-events: none; }
 
 /* ---------- Divers ---------- */
 .vide {
@@ -182,7 +187,6 @@ img { max-width: 100%; display: block; }
 .pied { border-top: 1px solid var(--bordure); padding: 24px 0; text-align: center; color: var(--texte-doux); font-size: 0.9rem; }
 
 /* ---------- Mobile ---------- */
-.logo, .nav a { white-space: nowrap; }
 @media (max-width: 560px) {
   .logo { font-size: 1rem; gap: 8px; }
   .logo__image { width: 28px; height: 28px; }

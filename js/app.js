@@ -85,6 +85,20 @@
       ? `<a class="bouton" href="${echapper(c.fichier)}" ${externe ? 'target="_blank" rel="noopener"' : "download"}>Télécharger</a>`
       : `<span class="bouton bouton--desactive">Bientôt disponible</span>`;
 
+    // Détails repliables : points forts, note et historique, pour garder
+    // des cartes compactes et de hauteur homogène dans la grille
+    const points = Array.isArray(c.points) && c.points.length
+      ? `<ul class="carte__points">${c.points.map(p => `<li>${echapper(p)}</li>`).join("")}</ul>`
+      : "";
+    const note = c.note ? `<p class="carte__note">${echapper(c.note)}</p>` : "";
+    const historique = creerHistorique(c.historique);
+    const details = points || note || historique
+      ? `<details class="details">
+          <summary>En savoir plus</summary>
+          <div class="details__contenu">${points}${note}${historique}</div>
+        </details>`
+      : "";
+
     return `
       <article class="carte">
         ${image}
@@ -92,13 +106,9 @@
           <span class="badge badge--${type}">${LIBELLES_TYPE[type]}</span>
           <h3 class="carte__titre">${echapper(c.titre)}</h3>
           <p class="carte__desc">${echapper(c.description)}</p>
-          ${Array.isArray(c.points) && c.points.length
-            ? `<ul class="carte__points">${c.points.map(p => `<li>${echapper(p)}</li>`).join("")}</ul>`
-            : ""}
           <div class="carte__infos">${infos}</div>
           ${bouton}
-          ${c.note ? `<p class="carte__note">${echapper(c.note)}</p>` : ""}
-          ${creerHistorique(c.historique)}
+          ${details}
         </div>
       </article>`;
   }

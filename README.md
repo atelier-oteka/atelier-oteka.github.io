@@ -4,7 +4,7 @@ Site statique (HTML/CSS/JS, sans dépendance) pour proposer mes logiciels et jeu
 
 ## Structure
 ```
-site-creations/
+atelier-oteka.github.io/
 ├── index.html          Page unique du site
 ├── css/style.css       Styles (thème modifiable via les variables :root)
 ├── js/creations.js     DONNÉES : textes du site + liste des créations
@@ -20,6 +20,9 @@ Double-cliquer sur `index.html`.
 1. Copier le fichier (idéalement en `.zip`) dans `telechargements/`.
 2. (Optionnel) Ajouter une image 16:9 dans `images/`.
 3. Dans `js/creations.js`, copier le modèle dans le tableau `CREATIONS` et le remplir.
+4. Dans `index.html`, changer la date `?v=` des scripts (sinon le cache navigateur masque la nouveauté).
+
+Les cartes affichent l'essentiel ; points forts, note et historique sont regroupés dans « En savoir plus ».
 
 ## Conseils
 - Compresser les `.exe` en `.zip` : moins de blocages navigateur/antivirus.
