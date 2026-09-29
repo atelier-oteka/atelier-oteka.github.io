@@ -41,6 +41,29 @@ const SITE = {
 
 const CREATIONS = [
   {
+    titre: "Grind Poker",
+    type: "logiciel",
+    description: "Pour faire monter sa bankroll en tournois Winamax, en apprenant à décider juste et vite. Un suivi de bankroll qui fixe tout seul ta limite de buy-in, une école de poker, et une vraie table d'entraînement avec un chrono sur ton siège : l'objectif est de prendre la bonne décision en moins de 10 secondes.",
+    points: [
+      "Vrai installateur : raccourci sur le Bureau, désinstallation propre",
+      "Bankroll : paliers de buy-in automatiques, alertes, courbe, stats et export CSV",
+      "École : 12 cours, guide « Que faire ? » pour 120 situations préflop, exercices illimités",
+      "Entraînement sur table 6-max : préflop et après-flop illimités, 30 coups complets, chrono 15/10/7 s",
+      "Ton niveau de Débutant à Expert, tes points faibles travaillés en priorité, tes erreurs à rejouer",
+      "Données dans un fichier avec sauvegardes datées, restaurables depuis le logiciel"
+    ],
+    version: "1.0.0",
+    date: "2026-09-29",
+    plateforme: "Windows 10 / 11",
+    taille: "8,3 Mo",
+    image: "images/grind-poker.png?v=2026-09-29",
+    fichier: "telechargements/GrindPoker-Installation-1.0.0.exe",
+    historique: [
+      { version: "1.0.0", date: "2026-09-29", changements: ["Première version : bankroll, école, entraînement sur table avec chrono, niveau et points faibles"] }
+    ],
+    note: "Conçu pour les tournois 6 joueurs Monster Stack en petites limites. L'installateur ne demande aucun droit administrateur et conserve vos données en cas de désinstallation. Grind Poker aide à apprendre, il ne garantit aucun gain."
+  },
+  {
     titre: "Mainscope",
     type: "logiciel",
     description: "Assistant de décision au Texas Hold'em, pour débutants. Vous donnez votre position, votre tapis et vos deux cartes : Mainscope répond par un seul ordre — ouvrir, se coucher, tapis, miser ou checker. Rien à calculer, aucun montant à saisir.",
