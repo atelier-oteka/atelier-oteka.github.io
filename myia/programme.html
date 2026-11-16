@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<!--
+  programme.html — Programme d'un parcours.
+  Le profil vient de l'adresse (programme.html#debutant) ou du profil mémorisé.
+  Le titre et le panneau sont remplis par js/programme.js depuis data/parcours.js.
+  Les leçons rédigées (data/lecons.js) sont cliquables, les autres sont marquées « Bientôt ».
+  L'en-tête et le pied de page sont injectés par js/commun.js.
+-->
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0B1020">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icones/icone-192.png">
+<link rel="apple-touch-icon" href="icones/icone-180.png">
+<title>Programme — Myia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/composants.css">
+</head>
+<body>
+
+<div id="entete"></div>
+
+<main>
+<section class="section section--premiere">
+  <div class="conteneur">
+    <nav class="retours" aria-label="Retour">
+      <a class="retour" href="index.html"><svg class="icone icone--retour" aria-hidden="true"><use href="#i-fleche"></use></svg>Accueil</a>
+      <a class="retour" href="parcours.html">Changer de profil</a>
+    </nav>
+    <div class="section__tete">
+      <h1 class="titre-2" id="titre-parcours">Programme</h1>
+    </div>
+    <div class="panneau" id="panneau-parcours"></div>
+    <noscript><p class="texte-doux">Activez JavaScript pour afficher le programme.</p></noscript>
+  </div>
+</section>
+</main>
+
+<div id="pied"></div>
+
+<!-- Ordre de chargement : données, progression, éléments communs, puis script de la page -->
+<script src="data/parcours.js"></script>
+<script src="data/lecons.js"></script>
+<script src="js/progression.js"></script>
+<script src="js/commun.js"></script>
+<script src="js/programme.js"></script>
+</body>
+</html>

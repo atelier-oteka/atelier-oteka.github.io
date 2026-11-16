@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<!--
+  index.html — Page d'accueil de Myia.
+  Un seul écran : la promesse et le bouton vers le choix du parcours (parcours.html).
+  L'en-tête et le pied de page sont injectés par js/commun.js.
+-->
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0B1020">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icones/icone-192.png">
+<link rel="apple-touch-icon" href="icones/icone-180.png">
+<title>Myia — Apprendre l'IA pas à pas</title>
+<meta name="description" content="Apprenez à utiliser l'IA gratuitement : leçons de cinq minutes, cas pratiques, prompts à copier et quiz.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/composants.css">
+</head>
+<body>
+
+<div id="entete"></div>
+
+<main>
+
+<!-- Héros : promesse à gauche, aperçu d'une leçon à droite -->
+<section class="heros">
+  <div class="conteneur heros__grille">
+    <div class="heros__texte">
+      <p class="etiquette etiquette--bord"><span class="etiquette__point"></span>100 % gratuit · Sans inscription</p>
+      <h1 class="titre-1">Maîtrisez l'IA, <span class="accent">une leçon à la fois.</span></h1>
+      <p class="heros__chapo">Des leçons de cinq minutes, des cas pratiques et des prompts prêts à copier. Du grand débutant au développeur.</p>
+      <div class="heros__actions">
+        <a class="bouton bouton--principal" data-page="parcours.html">Choisir mon parcours <svg class="icone" aria-hidden="true"><use href="#i-fleche"></use></svg></a>
+        <button class="bouton bouton--contour" type="button" data-installer hidden>Installer l'application</button>
+      </div>
+    </div>
+
+    <div class="heros__visuel" aria-hidden="true">
+      <div class="apercu">
+        <div class="apercu__tete">
+          <p class="surtitre surtitre--doux">Leçon 2 · Écrire un bon prompt</p>
+          <p class="etiquette">5 min</p>
+        </div>
+        <div class="encart">
+          <p class="surtitre">Votre prompt</p>
+          <p class="apercu__texte">Je suis plombier. Écris un mail de relance poli à un client qui n'a pas réglé sa facture. Cinq lignes maximum, ton cordial.</p>
+        </div>
+        <div class="encart encart--clair">
+          <p class="surtitre surtitre--doux">Réponse de l'IA</p>
+          <p class="apercu__texte">Bonjour, sauf erreur de ma part, la facture de mon intervention reste à régler. Pourriez-vous m'indiquer quand le paiement est prévu ? Je reste à votre disposition…</p>
+        </div>
+        <div class="apercu__points">
+          <span class="point-valide"><svg class="icone"><use href="#i-coche"></use></svg>Contexte</span>
+          <span class="point-valide"><svg class="icone"><use href="#i-coche"></use></svg>Tâche</span>
+          <span class="point-valide"><svg class="icone"><use href="#i-coche"></use></svg>Format</span>
+        </div>
+      </div>
+      <div class="apercu-badge">
+        <span class="apercu-badge__rond"><svg class="icone"><use href="#i-coche"></use></svg></span>
+        <span><span class="apercu-badge__titre">Quiz validé</span><span class="texte-doux texte-petit">Leçon suivante débloquée</span></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<div id="pied"></div>
+
+<script src="js/commun.js"></script>
+</body>
+</html>

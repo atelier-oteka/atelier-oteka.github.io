@@ -41,6 +41,29 @@ const SITE = {
 
 const CREATIONS = [
   {
+    titre: "Myia",
+    type: "logiciel",
+    description: "Apprendre à utiliser l'IA pas à pas : des leçons de cinq minutes, des cas pratiques, des prompts prêts à copier et des quiz. Gratuit, sans compte, installable sur téléphone et sur ordinateur.",
+    points: [
+      "4 parcours : grand débutant, pro ou indépendant, créateur de contenu, développeur",
+      "32 leçons de cinq minutes, chacune avec un exemple, un exercice et un quiz",
+      "12 cas pratiques guidés, du premier prompt au résultat final",
+      "30 prompts prêts à copier, classés par usage",
+      "Comparatif d'outils par besoin : texte, image, vidéo, code",
+      "Progression enregistrée sur l'appareil ; fonctionne sans connexion une fois installée"
+    ],
+    version: "1.0.0",
+    date: "2026-11-16",
+    plateforme: "Navigateur, Android, iPhone, Windows",
+    taille: "0,3 Mo",
+    image: "images/myia.png?v=2026-11-16",
+    fichier: "https://atelier-oteka.github.io/myia/",
+    historique: [
+      { version: "1.0.0", date: "2026-11-16", changements: ["Première version : 4 parcours, 32 leçons, 12 cas pratiques, 9 quiz, 30 prompts et un comparatif d'outils"] }
+    ],
+    note: "Application web : le bouton ouvre Myia dans le navigateur, sans rien télécharger. Pour l'installer, utilisez le bouton « Installer l'application » de sa page d'accueil ; sur iPhone, passez par Partager puis « Sur l'écran d'accueil ». Les contenus ont été rédigés avec l'aide d'une IA."
+  },
+  {
     titre: "Hold'Up",
     type: "jeu",
     description: "L'école du poker : apprenez le Texas Hold'em No Limit en jouant un tournoi Monster Stack de 100 joueurs contre des adversaires virtuels, avec un coach qui conseille et corrige chacune de vos décisions.",
