@@ -195,22 +195,27 @@ const CREATIONS = [
   {
     titre: "Optimeo",
     type: "logiciel",
-    description: "Rendez votre PC plus rapide en un clic. Optimeo analyse Windows, applique uniquement les réglages utiles et sans risque, puis vérifie que chaque correction a vraiment fonctionné. Tout est sauvegardé et annulable.",
+    description: "Optimeo analyse votre PC Windows et présente les réglages à vérifier. Les réglages réversibles sont sauvegardés avant modification. Les nettoyages de fichiers sont définitifs.",
     points: [
       "Tableau de bord : note de santé du PC, gains possibles, matériel et recommandations",
       "« Tout optimiser » : nettoyage, démarrage allégé, réglages jeux et confidentialité",
       "Mises à jour des logiciels, des pilotes et de Windows",
-      "Liste des logiciels et jeux installés, avec désinstallation vérifiée",
-      "Point de restauration créé avant chaque modification",
+      "Inventaire des logiciels et jeux, avec désinstallation guidée pour Epic et les applications du compte utilisateur",
+      "Point de restauration demandé avant les optimisations",
       "Aucune fausse astuce : ni nettoyage du registre, ni Defender désactivé"
     ],
-    version: "1.1.1",
-    date: "2026-09-17",
+    version: "1.2.1",
+    date: "2026-11-22",
     plateforme: "Windows 10 / 11",
-    taille: "305 Ko",
+    taille: "241 Ko",
     image: "images/optimeo.png",
-    fichier: "telechargements/Optimeo-Installation-1.1.1.exe",
+    fichier: "telechargements/Optimeo-Installation-1.2.1.exe",
     historique: [
+      { version: "1.2.1", date: "2026-11-22", changements: [
+        "Sauvegarde avant modification et contrôle des droits de l’historique",
+        "Signalement des vérifications incomplètes et des mises à jour partielles",
+        "Nettoyage protégé contre les jonctions et désinstallation guidée pour Epic et les applications du compte utilisateur"
+      ] },
       { version: "1.1.1", date: "2026-09-17", changements: [
         "Correction d'une erreur au lancement lors de l'analyse automatique du tableau de bord"
       ] },
@@ -224,6 +229,6 @@ const CREATIONS = [
         "Première version : Tout optimiser avec vérification, rapport, mises à jour, logiciels et jeux, installateur"
       ] }
     ],
-    note: "Logiciel non signé : dans Chrome, cliquez « Conserver » puis « Conserver quand même ». À l'ouverture, Windows peut afficher « Windows a protégé votre ordinateur » : cliquez « Informations complémentaires » puis « Exécuter quand même »."
+    note: "Installateur pour Windows 64 bits. Il demande les droits administrateur et ne porte pas de signature numérique."
   }
 ];
