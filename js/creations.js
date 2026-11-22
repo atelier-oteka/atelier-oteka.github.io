@@ -191,13 +191,14 @@ const CREATIONS = [
       "Temps par image, déplacement et ruban des images présentées",
       "Aucune installation, aucune connexion : un seul fichier à lancer"
     ],
-    version: "1.0.0",
-    date: "2026-09-18",
+    version: "1.2.0",
+    date: "2026-11-22",
     plateforme: "Windows 10 / 11",
-    taille: "14 Mo",
+    taille: "47,5 Kio",
     image: "images/fluidoscope.png",
-    fichier: "telechargements/Fluidoscope-1.0.0.exe",
+    fichier: "telechargements/Fluidoscope-1.2.0.exe",
     historique: [
+      { version: "1.2.0", date: "2026-11-22", changements: ["Pistes colorées et réglages latéraux", "Cadence de rendu actualisée pendant la lecture", "Changement de vitesse continu et rendu suspendu en pause", "Lanceur Windows indépendant de Python"] },
       { version: "1.0.0", date: "2026-09-18", changements: [
         "Première version : 8 tranches de 24 à 240 FPS",
         "Scènes Panoramique, Rotation et Visée",
@@ -205,7 +206,7 @@ const CREATIONS = [
         "Mesure de la fréquence de l'écran au démarrage"
       ] }
     ],
-    note: "Le rendu passe par WebView2, déjà présent sur Windows 10 et 11. Logiciel non signé : dans Chrome, cliquez « Conserver » puis « Conserver quand même », et « Exécuter quand même » si Windows affiche un avertissement."
+    note: "Le lanceur ouvre Fluidoscope dans une fenêtre Edge ou dans le navigateur par défaut. L’application fonctionne hors ligne."
   },
   {
     titre: "Optimeo",
