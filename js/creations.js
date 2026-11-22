@@ -113,13 +113,18 @@ const CREATIONS = [
       "Carnet : bankroll, historique des tournois, ROI, sauvegardes restaurables",
       "Deux modes : réduit pour jouer vite, complet pour analyser juste"
     ],
-    version: "2.3.0",
-    date: "2026-09-20",
-    plateforme: "Windows 10 / 11",
-    taille: "8,1 Mo",
+    version: "2.3.1",
+    date: "2026-11-22",
+    plateforme: "Windows 10 / 11 (64 bits)",
+    taille: "591 Ko",
     image: "images/mainscope-1.0.0.png",
-    fichier: "telechargements/Mainscope-Installation-2.3.0.exe",
+    fichier: "telechargements/Mainscope-Installation-2.3.1.exe",
     historique: [
+      { version: "2.3.1", date: "2026-11-22", changements: [
+        "Le carnet est enregistré dès la saisie. En cas d’échec, un bouton permet de réessayer.",
+        "Une copie protège l’historique avant son effacement.",
+        "La mise à jour Windows conserve la bankroll, les tournois et les sauvegardes existantes."
+      ] },
       { version: "2.3.0", date: "2026-09-20", changements: [
         "Le tapis se donne au nombre exact de grosses blindes, au clavier ou d'un pas à la fois",
         "Le mode réduit garde ses trois paliers ; passer d'un mode à l'autre reporte la valeur"
