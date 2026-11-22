@@ -41,6 +41,21 @@ const SITE = {
 
 const CREATIONS = [
   {
+    titre: "Myia",
+    type: "logiciel",
+    description: "Apprenez à utiliser l’IA à votre rythme avec quatre parcours, 32 leçons et 12 cas pratiques.",
+    points: ["30 prompts à copier et 9 quiz de module", "Contenu accessible hors ligne et progression enregistrée sur l’appareil"],
+    version: "1.1.1",
+    date: "2026-11-22",
+    plateforme: "Windows 10 / 11 (64 bits) et Android 7 ou ultérieur",
+    image: "images/myia.png",
+    fichier: "telechargements/Myia-Installation-1.1.1.exe",
+    libelleFichier: "Windows (.exe)",
+    fichierAndroid: "telechargements/Myia-1.1.1.apk",
+    historique: [{ version: "1.1.1", date: "2026-11-22", changements: ["Installation sur Windows et Android, reprise des leçons et sauvegarde de la progression."] }],
+    note: "Windows utilise Microsoft Edge WebView2. Sur Android, ouvrez le fichier APK pour installer Myia."
+  },
+  {
     titre: "Hold'Up",
     type: "jeu",
     description: "L'école du poker : apprenez le Texas Hold'em No Limit en jouant un tournoi Monster Stack de 100 joueurs contre des adversaires virtuels, avec un coach qui conseille et corrige chacune de vos décisions.",

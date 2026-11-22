@@ -74,7 +74,7 @@
     // Bouton : lien externe → nouvel onglet ; fichier local → attribut download
     const externe = /^https?:\/\//i.test(c.fichier || "");
     const bouton = c.fichier
-      ? `<a class="bouton" href="${echapper(c.fichier)}" ${externe ? 'target="_blank" rel="noopener"' : "download"}>Télécharger</a>`
+      ? `<a class="bouton" href="${echapper(c.fichier)}" ${externe ? 'target="_blank" rel="noopener"' : "download"}>${echapper(c.libelleFichier || 'Télécharger')}</a>`
       : `<span class="bouton bouton--desactive">Bientôt disponible</span>`;
 
     return `
@@ -89,6 +89,7 @@
             : ""}
           <div class="carte__infos">${infos}</div>
           ${bouton}
+          ${c.fichierAndroid ? `<a class="bouton" href="${echapper(c.fichierAndroid)}" download>Android (.apk)</a>` : ''}
           ${c.note ? `<p class="carte__note">${echapper(c.note)}</p>` : ""}
           ${creerHistorique(c.historique)}
         </div>
