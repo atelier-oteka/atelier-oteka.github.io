@@ -1,0 +1,1442 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Grind Poker</title>
+<link rel="icon" href="logo.svg">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+/* =====================================================================
+   GRIND POKER — application unique : suivi de bankroll + école de poker
+   Mise en page : barre latérale (≥ 900 px) / barre d'onglets en bas (mobile).
+   Vues : Accueil · Tournois · Stats · École · Règles
+   ===================================================================== */
+:root{--bg:#eef2ef;--card:#fff;--fg:#16201a;--mute:#5a6a61;--line:#d3dcd6;--felt:#1b6a44;--felt2:#e3efe8;--pair:#2f5fa8;--suit:#9a6200;--off:#e9eeeb;--win:#1d7a49;--loss:#b53a3a;--warn:#a86a00;--gold:#b8872a;
+--disp:"Archivo",system-ui,sans-serif;--mono:"IBM Plex Mono",ui-monospace,monospace;--r:12px}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1310;--card:#151d18;--fg:#e5ece7;--mute:#91a298;--line:#27332c;--felt:#3fae76;--felt2:#1b2d23;--pair:#4d82d6;--suit:#c9901f;--off:#1e2822;--win:#4cc98a;--loss:#ef7b7b;--warn:#f0b54a;--gold:#d9b35c;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0d1310;--card:#151d18;--fg:#e5ece7;--mute:#91a298;--line:#27332c;--felt:#3fae76;--felt2:#1b2d23;--pair:#4d82d6;--suit:#c9901f;--off:#1e2822;--win:#4cc98a;--loss:#ef7b7b;--warn:#f0b54a;--gold:#d9b35c;color-scheme:dark}
+*{box-sizing:border-box}[hidden]{display:none!important}
+body{margin:0}/* hors claude.ai, aucune marge par défaut */
+body{background:var(--bg);color:var(--fg);font:15px/1.55 system-ui,sans-serif}
+
+/* ---- Structure ---- */
+.app{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
+.side{position:sticky;top:0;height:100vh;padding:22px 14px;border-right:1px solid var(--line);background:var(--card);display:flex;flex-direction:column;gap:18px}
+.brand{font:800 20px var(--disp);letter-spacing:-.01em}.brand small{display:block;font:500 12px system-ui;color:var(--mute)}
+.menu{display:grid;gap:4px}
+.menu button{display:flex;align-items:center;gap:10px;font:600 14px var(--disp);padding:10px 12px;border:0;border-radius:8px;background:none;color:var(--fg);cursor:pointer;text-align:left}
+.menu button svg{width:18px;height:18px;flex:none}
+.menu button[aria-current="true"]{background:var(--felt2);color:var(--felt)}
+.brchip{margin-top:auto;padding:12px;border-radius:10px;background:var(--felt2)}.brchip b{display:block;font:600 22px var(--mono)}
+.content{min-width:0;padding-block:24px 40px;padding-inline:24px}
+.view{max-width:880px;margin:0 auto;display:grid;gap:18px}
+@media (max-width:899px){
+ .app{grid-template-columns:1fr}
+ .side{position:fixed;inset:auto 0 0 0;height:auto;padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px));flex-direction:row;border-right:0;border-top:1px solid var(--line);z-index:10}
+ .brand,.brchip{display:none}
+ .menu{grid-template-columns:repeat(6,1fr);width:100%}
+ .menu button{flex-direction:column;gap:2px;font-size:11px;padding:6px 2px;text-align:center}
+ .content{padding-inline:16px;padding-block:16px 96px}
+}
+
+/* ---- Éléments communs ---- */
+h1{font:800 26px var(--disp);margin:0;letter-spacing:-.01em}h2{font:800 20px var(--disp);margin:0 0 10px;text-wrap:balance}h3{font:700 16px var(--disp);margin:16px 0 6px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px;min-width:0}
+.mute{color:var(--mute);font-size:13px}
+p,li{max-width:68ch}ul{padding-left:18px;margin:6px 0}li{margin:3px 0}
+.btn{font:700 14px var(--disp);padding:10px 16px;border:1px solid var(--felt);border-radius:8px;background:var(--card);color:var(--felt);cursor:pointer}
+.btn.main{background:var(--felt);color:var(--card)}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible{outline:2px solid var(--felt);outline-offset:2px}
+.tw{overflow-x:auto}table{width:100%;border-collapse:collapse;font:13px var(--mono);font-variant-numeric:tabular-nums}
+td,th{padding:7px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{font:600 12px system-ui;color:var(--mute)}
+.p{color:var(--win)}.n{color:var(--loss)}
+.x{background:none;border:0;color:var(--mute);cursor:pointer;font-size:14px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px}
+.tip{border-left:3px solid var(--felt);padding:8px 12px;background:var(--felt2);border-radius:0 8px 8px 0}
+.alert{padding:10px 14px;border-radius:8px;border:1px solid var(--line);border-left:4px solid var(--warn);background:var(--card)}
+.alert.ok{border-left-color:var(--win)}.alert.bad{border-left-color:var(--loss)}
+.linkbtn{background:none;border:0;padding:0;font:700 14px var(--disp);color:var(--felt);cursor:pointer;text-decoration:underline}
+
+/* ---- Accueil ---- */
+.hero{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:end}
+.big{font:600 40px var(--mono);font-variant-numeric:tabular-nums;line-height:1.1}
+.pill{display:inline-block;padding:3px 12px;border-radius:99px;background:var(--felt);color:var(--card);font:600 13px var(--mono)}
+.bar{height:10px;background:var(--line);border-radius:5px;overflow:hidden;margin:12px 0 6px}.bar i{display:block;height:100%;background:var(--felt)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}
+.kpis div{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;font:600 20px var(--mono)}.kpis span{display:block;font:12px system-ui;color:var(--mute)}
+#chart text{fill:var(--mute);font:11px var(--mono)}
+.hand{border-bottom:1px solid var(--line);padding:8px 0;white-space:pre-wrap}
+
+/* ---- Formulaire ---- */
+form{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+label{display:grid;gap:4px;font-size:12px;color:var(--mute)}.full{grid-column:1/-1}
+input,select,textarea{font:14px var(--mono);padding:8px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);width:100%}
+.seg{display:flex;flex-wrap:wrap;gap:6px}.seg button{font:600 13px var(--disp);padding:7px 11px;border:1px solid var(--line);border-radius:99px;background:var(--card);color:var(--fg);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--felt);border-color:var(--felt);color:var(--card)}
+.toast{position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:8px;font:600 14px var(--disp);z-index:20}
+@media (min-width:900px){.toast{bottom:24px}}
+
+/* ---- École ---- */
+.lessons{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin}
+.lessons button{flex:0 0 auto;white-space:nowrap;font:600 13px var(--disp);padding:7px 11px;border:1px solid var(--line);border-radius:99px;background:var(--card);color:var(--fg);cursor:pointer}
+.lessons button[aria-selected="true"]{background:var(--felt);color:var(--card);border-color:var(--felt)}
+.lessons button.extra{border-style:dashed}
+.prog{display:flex;align-items:center;gap:10px;font:600 13px var(--mono)}.prog .bar{flex:1;margin:0}
+.grid{display:grid;grid-template-columns:repeat(13,minmax(24px,1fr));gap:2px;max-width:560px;font:600 12px var(--mono)}
+.grid div{aspect-ratio:1;display:grid;place-items:center;border-radius:3px;background:var(--off);color:var(--mute);cursor:pointer}
+.grid div.in{color:#fff}.grid div.in.p{background:var(--pair)}.grid div.in.s{background:var(--suit)}.grid div.in.o{background:var(--felt)}
+.grid div.sel{outline:2px solid var(--fg);outline-offset:-2px}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--mute);margin:8px 0}.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px}
+.chartwrap{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-start}.chartwrap>.tw{flex:1 1 300px;min-width:0}
+.detail{margin-top:8px;font:14px var(--mono)}
+.q{margin:12px 0;padding-top:10px;border-top:1px solid var(--line)}.q b{display:block;margin-bottom:6px}
+.opts{display:grid;gap:6px}.opts button{text-align:left;font:14px system-ui;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);cursor:pointer}
+.opts button.good{border-color:var(--win);color:var(--win)}.opts button.bad{border-color:var(--loss);color:var(--loss)}
+.exp{font-size:14px;color:var(--mute);margin-top:6px}.score{font:600 14px var(--mono)}
+.qbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px}
+.qbar button,.pager button,.train .row button{font:600 13px var(--disp);padding:8px 13px;border:1px solid var(--felt);border-radius:8px;background:var(--card);color:var(--felt);cursor:pointer}
+.pager button.main,.train .row button.main{background:var(--felt);color:var(--card)}
+.memo{margin-top:18px;padding:14px 16px;border:2px dashed var(--felt);border-radius:10px}.memo h3{margin-top:0}
+.pager{display:flex;justify-content:space-between;gap:10px;margin-top:18px}.pager button:disabled{visibility:hidden}
+.train{margin-top:14px;padding:14px;background:var(--felt2);border-radius:10px;display:grid;gap:10px}
+.cards{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.pc{width:48px;height:66px;border-radius:7px;background:#fff;border:1px solid #cfd6d2;display:grid;place-items:center;font:800 22px var(--disp);color:#16201a;box-shadow:0 1px 2px #0002}.pc.red{color:#c0392b}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+@media (prefers-reduced-motion:no-preference){.view{animation:fade .18s ease-out}@keyframes fade{from{opacity:.4}to{opacity:1}}}
+
+/* ---- Identité « salle de poker » : carte tapis vert + accents or ---- */
+.brand::before{content:"♠";display:inline-grid;place-items:center;width:30px;height:30px;margin-right:8px;border-radius:8px;background:linear-gradient(135deg,#1f7a4f,#0f3d27);color:#e9c874;font-size:17px;vertical-align:middle}
+.brand small{margin-top:4px}
+.herocard{background:radial-gradient(130% 150% at 0% 0%,#237f53 0%,#124a30 55%,#0b2e1e 100%);color:#f4efe2;border:0;box-shadow:0 10px 30px -12px #0b2e1e99;position:relative;overflow:hidden}
+.herocard::after{content:"♠ ♥ ♦ ♣";position:absolute;right:-6px;bottom:-18px;font:800 84px var(--disp);letter-spacing:-6px;color:#ffffff0d;pointer-events:none}
+.herocard .mute{color:#c9dccf}.herocard .big{font-size:46px;color:#fff}
+.herocard .pill{background:#e0bb62;color:#1c1604}
+.herocard .bar{background:#ffffff24}.herocard .bar i{background:linear-gradient(90deg,#d9b35c,#f4dc93)}
+.herocard .btn{background:transparent;border-color:#f4efe2aa;color:#f4efe2}.herocard .btn.main{background:#e0bb62;border-color:#e0bb62;color:#1c1604}
+.menu button[aria-current="true"]{box-shadow:inset 3px 0 0 var(--gold)}
+@media (max-width:899px){.menu button[aria-current="true"]{box-shadow:inset 0 3px 0 var(--gold)}}
+.kpis div{position:relative}.kpis div::before{content:"";position:absolute;left:12px;top:0;width:24px;height:3px;border-radius:0 0 3px 3px;background:var(--gold)}
+.card h2{letter-spacing:-.01em}
+.btn,.card,.kpis div{transition:transform .12s,box-shadow .12s}.btn:hover{transform:translateY(-1px)}
+@media (prefers-reduced-motion:reduce){.btn,.card,.kpis div{transition:none}.btn:hover{transform:none}}
+
+/* =====================================================================
+   FINITIONS PREMIUM — appliquées à toutes les sections
+   ===================================================================== */
+:root{--felt-grad:radial-gradient(130% 150% at 0% 0%,#237f53 0%,#124a30 55%,#0b2e1e 100%);--ink:#f4efe2;--gold-b:#e0bb62;--shadow:0 1px 2px #0000000d,0 10px 28px -18px #0b2e1e55}
+/* Titres de section : bandeau tapis vert */
+.view>h1{position:relative;overflow:hidden;padding:20px 22px;border-radius:var(--r);background:var(--felt-grad);color:var(--ink);box-shadow:var(--shadow)}
+.view>h1::after{content:"♠ ♥ ♦ ♣";position:absolute;right:-4px;bottom:-16px;font:800 64px var(--disp);letter-spacing:-5px;color:#ffffff0d}
+.view>h1::before{content:"GRIND POKER";display:block;font:600 11px var(--mono);letter-spacing:.14em;color:var(--gold-b);margin-bottom:2px}
+/* Cartes */
+.card{box-shadow:var(--shadow)}
+.card h2::before{content:"";display:inline-block;width:4px;height:.9em;margin-right:10px;border-radius:2px;background:var(--gold);vertical-align:-1px}
+.brchip{background:var(--felt-grad);color:var(--ink)}.brchip .mute{color:#c9dccf}.brchip b{color:#fff}
+/* Tableaux */
+th{text-transform:uppercase;letter-spacing:.08em;font-size:11px}
+tbody tr:hover td{background:var(--felt2)}
+/* Formulaire */
+input:focus,select:focus,textarea:focus{border-color:var(--gold);outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--gold) 25%,transparent)}
+.seg button[aria-pressed="true"]{background:var(--felt);border-color:var(--gold)}
+.btn.main{background:var(--felt);box-shadow:inset 0 -2px 0 #0003}
+.toast{background:#0f2a1d;color:var(--ink);border:1px solid var(--gold-b);box-shadow:0 10px 30px #0006}
+/* École */
+.lessons button[aria-selected="true"]{box-shadow:inset 0 -3px 0 var(--gold-b)}
+#lesson>h2:first-child{font-size:24px;padding-bottom:12px;margin-bottom:14px;border-bottom:1px solid var(--line)}
+#lesson>h2:first-child::before{height:1em}
+.tip{border-left-color:var(--gold);background:color-mix(in srgb,var(--gold) 9%,var(--card))}
+.memo{border:1px solid color-mix(in srgb,var(--gold) 45%,var(--line));border-left:4px solid var(--gold);background:color-mix(in srgb,var(--gold) 7%,var(--card))}
+.opts button:hover{border-color:var(--gold)}
+.opts button.good{background:color-mix(in srgb,var(--win) 12%,var(--card))}.opts button.bad{background:color-mix(in srgb,var(--loss) 12%,var(--card))}
+/* Entraînement : table de jeu */
+.train{background:var(--felt-grad);color:var(--ink);box-shadow:var(--shadow);padding:18px}
+.train>b:first-child{font:600 11px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--gold-b)}
+.train .mute,.train .exp{color:#cfe0d5}.train .score{color:var(--gold-b)}
+.train .opts button{background:#ffffff12;border-color:#ffffff33;color:var(--ink)}
+.train .opts button:hover{border-color:var(--gold-b)}
+.train .opts button.good{background:#4cc98a33;border-color:#4cc98a;color:#fff}.train .opts button.bad{background:#ef7b7b33;border-color:#ef7b7b;color:#fff}
+.train .row button,.train .qbar button{background:transparent;border-color:#f4efe2aa;color:var(--ink)}
+.train .row button.main{background:var(--gold-b);border-color:var(--gold-b);color:#1c1604}
+.pc{width:56px;height:78px;font-size:24px;box-shadow:0 6px 14px -4px #0008;border-radius:8px}
+/* Grille de mains */
+.grid div{transition:transform .1s}.grid div:hover{transform:scale(1.08)}
+.detail{padding:8px 12px;border-radius:8px;background:var(--felt2)}
+@media (prefers-reduced-motion:reduce){.grid div{transition:none}.grid div:hover{transform:none}}
+/* Correctifs mobile (audit) */
+.big{white-space:nowrap}
+@media (max-width:899px){.hero{grid-template-columns:1fr}.hero>div:last-child{text-align:left!important}.herocard .big{font-size:40px}
+ .kpis{grid-template-columns:1fr 1fr}.kpis div:last-child:nth-child(odd){grid-column:1/-1}}
+/* Guide : couleurs des actions */
+.grid div.in.a1{background:var(--felt);color:#fff}.grid div.in.a2{background:var(--pair);color:#fff}
+.legend i.a1{background:var(--felt)}.legend i.a2{background:var(--pair)}
+.train .cards svg{margin-left:auto}
+.train .tip{background:#ffffff14;color:var(--ink)}
+/* Grille de mains : tient toujours dans la largeur (mobile) */
+.grid{grid-template-columns:repeat(13,minmax(0,1fr))}
+@media (max-width:520px){.grid{font-size:9px;gap:1px}.grid div{border-radius:2px}}
+/* Chrono de décision */
+.trow{display:flex;align-items:center;gap:10px}.tbar{flex:1;height:6px;border-radius:3px;background:#ffffff26;overflow:hidden}
+.tbar i{display:block;height:100%;background:var(--gold-b);transition:width .1s linear}.tbar i.hot{background:#ef7b7b}
+.tlab{font:600 13px var(--mono);color:var(--gold-b);min-width:44px;text-align:right}
+/* ---- Table réaliste ---- */
+.tb-title{font:600 12px var(--mono);letter-spacing:.06em;color:var(--gold-b);text-transform:uppercase}
+.ptable{position:relative;width:100%;max-width:640px;margin:10px auto 0;aspect-ratio:16/10}
+.felt{position:absolute;inset:14% 9% 16%;border-radius:999px;background:radial-gradient(ellipse at 50% 40%,#2a8a5a,#155337 70%,#0e3d27);border:8px solid #3a2616;box-shadow:inset 0 0 0 2px #e0bb6255,0 16px 30px -10px #000a;display:grid;place-items:center}
+.center{display:grid;gap:6px;justify-items:center}
+.pot{font:600 13px var(--mono);color:#1c1604;background:var(--gold-b);padding:2px 10px;border-radius:99px}
+.board{display:flex;gap:4px;min-height:44px;align-items:center}
+.pc.sm{width:32px;height:44px;font-size:14px;border-radius:5px}
+.seat{position:absolute;width:92px;transform:translate(-50%,-50%);display:grid;justify-items:center;gap:1px;text-align:center;transition:opacity .2s}
+.seat.out{opacity:.4}
+.s0{left:50%;top:92%}.s1{left:8%;top:72%}.s2{left:8%;top:22%}.s3{left:50%;top:5%}.s4{left:92%;top:22%}.s5{left:92%;top:72%}
+.av{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:#1b2a22;color:var(--ink);font:700 14px var(--disp);border:2px solid #ffffff33}
+.me .av{background:var(--gold-b);color:#1c1604;border-color:#fff}
+.nm{font:600 11px system-ui;color:var(--ink);background:#0b1f15cc;padding:1px 6px;border-radius:6px;white-space:nowrap}.pb{margin-left:4px;color:var(--gold-b);font:700 10px var(--mono)}
+.stk{font:600 11px var(--mono);color:#cfe0d5}
+.backs{display:flex;gap:2px;position:absolute;top:-6px;right:6px}.backs i{width:14px;height:20px;border-radius:3px;background:repeating-linear-gradient(45deg,#8b1d1d 0 3px,#a83232 3px 6px);border:1px solid #fff8}
+.st{font:700 10px var(--mono);padding:1px 6px;border-radius:5px;background:#0008;color:var(--ink)}
+.st-raise,.st-allin{background:#b53a3a;color:#fff}.st-limp{background:#2f5fa8;color:#fff}
+.chip{font:600 10px var(--mono);color:#1c1604;background:#f4efe2;border-radius:99px;padding:0 6px}
+.dealer{position:absolute;right:-2px;top:14px;width:18px;height:18px;border-radius:50%;background:#fff;color:#111;font:800 10px var(--disp);display:grid;place-items:center;box-shadow:0 1px 3px #0008}
+.ring{position:absolute;left:50%;top:0;width:54px;height:54px;transform:translate(-50%,-8px) rotate(-90deg);pointer-events:none}
+.ring circle{fill:none;stroke:#ffffff22;stroke-width:6}.ring .t{stroke:var(--gold-b);stroke-dasharray:100;stroke-dashoffset:0;transition:stroke-dashoffset .1s linear}.ring .t.hot{stroke:#ef4f4f}
+.ptable.done .ring{display:none}
+.herocards{position:absolute;left:50%;top:70%;transform:translate(-50%,-50%);display:flex;gap:4px}
+.herocards .pc{width:44px;height:62px;font-size:20px}
+.turn{margin-top:12px;font:600 15px system-ui}.tlab2{display:inline-block;background:var(--gold-b);color:#1c1604;font:700 12px var(--mono);padding:2px 8px;border-radius:6px;margin-right:6px}
+.acts{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-top:10px}
+.acts button{font:700 15px var(--disp);padding:14px 10px;border-radius:10px;border:0;cursor:pointer;color:#fff;box-shadow:inset 0 -3px 0 #0003}
+.acts .fold{background:#5b6a62}.acts .call{background:#2f6fb5}.acts .raise{background:#1f8a55}.acts .allin{background:#b53a3a}
+.acts button.good{outline:3px solid #7dffb6;outline-offset:2px}.acts button.bad{outline:3px solid #ff8a8a;outline-offset:2px;opacity:.7}
+@media (max-width:520px){.seat{width:70px}.av{width:30px;height:30px;font-size:12px}.nm{font-size:10px}.pc.sm{width:24px;height:34px;font-size:11px}.herocards .pc{width:36px;height:50px;font-size:16px}.ring{width:44px;height:44px}.ptable{aspect-ratio:4/3.8}.herocards{top:68%}.s0{top:93%}.center{margin-top:-18%}.s1,.s2{left:10%}.s4,.s5{left:90%}}
+/* ---- Niveau et progression ---- */
+.hero-lv{display:flex;gap:16px;align-items:center}.hero-lv>div:last-child{flex:1;min-width:0}
+.lvbadge{flex:none;width:64px;height:64px;border-radius:50%;display:grid;place-items:center;font:800 24px var(--mono);color:#1c1604;background:radial-gradient(circle at 35% 30%,#f7e2a4,#d9a93f);box-shadow:0 0 0 4px var(--felt2),0 6px 16px -6px #0008}
+.lvbadge.big2{width:84px;height:84px;font-size:30px}
+#prog-chart text{fill:var(--mute);font:11px var(--mono)}
+.wrow{display:grid;grid-template-columns:minmax(0,1fr) 90px 44px;gap:10px;align-items:center;font-size:13px;padding:5px 0}.wrow .bar{margin:0;height:8px}.wrow b{font:600 13px var(--mono);text-align:right}
+.evalres{display:flex;gap:18px;align-items:center;margin:12px 0;color:var(--ink)}.evalres p{margin:4px 0}
+.train .evt td,.train .evt th{color:var(--ink);border-color:#ffffff22}.train tbody tr:hover td{background:#ffffff10}
+/* Barre d'onglets mobile : 6 onglets sans débordement */
+@media (max-width:899px){.menu{grid-template-columns:repeat(6,minmax(0,1fr))}.menu button{min-width:0;font-size:10px;overflow:hidden}.menu button{white-space:nowrap;text-overflow:ellipsis}}
+</style>
+<div class="app">
+ <!-- Navigation principale : barre latérale (desktop) ou barre d'onglets (mobile) -->
+ <aside class="side">
+  <div class="brand">Grind Poker<small>Winamax · tournois 6-max</small></div>
+  <nav class="menu" id="menu" aria-label="Sections">
+   <button data-v="accueil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Accueil</button>
+   <button data-v="tournois"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>Tournois</button>
+   <button data-v="stats"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Stats</button>
+   <button data-v="ecole"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8l10-5 10 5-10 5z"/><path d="M6 10v5c3 3 9 3 12 0v-5"/></svg>École</button>
+   <button data-v="entrainement"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg>Entraînement</button>
+   <button data-v="regles"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/></svg>Règles</button>
+  </nav>
+  <div class="brchip"><span class="mute">Bankroll</span><b id="side-br">34,51 €</b><span class="mute" id="side-lim"></span></div>
+ </aside>
+
+ <main class="content">
+  <!-- ===== ACCUEIL ===== -->
+  <section class="view" id="v-accueil">
+   <div class="card herocard">
+    <div class="hero">
+     <div><div class="mute">Bankroll actuelle</div><div class="big" id="br">34,51 €</div></div>
+     <div style="text-align:right"><div class="mute">Limite autorisée</div><span class="pill" id="lim">0,25 €</span></div>
+    </div>
+    <div class="bar"><i id="prog" style="width:0%"></i></div>
+    <div class="mute" id="progtxt"></div>
+    <div class="row" style="margin-top:14px"><button class="btn main" id="go-add">+ Ajouter un tournoi</button><button class="btn" id="go-school">Continuer l'école</button></div>
+   </div>
+   <div id="alerts" style="display:grid;gap:8px"></div>
+   <div class="kpis">
+    <div id="k-n">0<span>tournois</span></div><div id="k-roi">—<span>ROI</span></div><div id="k-itm">—<span>ITM</span></div>
+    <div id="k-ft">0<span>tables finales</span></div><div id="k-week">0 / 20<span>cette semaine</span></div>
+   </div>
+   <div class="card"><h2>Courbe de bankroll</h2><div class="tw"><svg id="chart" viewBox="0 0 760 220" width="100%" role="img" aria-label="Évolution de la bankroll"></svg></div></div>
+   <div class="card"><h2>Cours conseillés</h2><div id="reco" class="mute">Ajoute au moins 10 tournois pour recevoir des conseils personnalisés.</div></div>
+  </section>
+
+  <!-- ===== TOURNOIS ===== -->
+  <section class="view" id="v-tournois" hidden>
+   <h1>Tournois</h1>
+   <div class="card">
+    <h2 id="f-title">Ajouter un tournoi</h2>
+    <form id="f">
+     <label>Date<input id="d" type="date" required></label>
+     <label>Heure<input id="h" type="time" value="20:30"></label>
+     <label>Tournoi<select id="t"><option>Monster Stack</option><option>MiniRoll</option><option>Deepstack</option><option>Expresso</option><option>Autre</option></select></label>
+     <label>Buy-in (€)<input id="b" type="number" step="0.01" min="0" value="0.25" required></label>
+     <label>Gain (€)<input id="g" type="number" step="0.01" min="0" value="0" required></label>
+     <label>Place<input id="n" type="text" placeholder="ex. 12e/340"></label>
+     <div class="full"><div class="mute" style="margin-bottom:4px">Résultat</div><div class="seg" id="res">
+      <button type="button" data-r="out" aria-pressed="true">Hors argent</button><button type="button" data-r="itm" aria-pressed="false">Dans l'argent</button><button type="button" data-r="ft" aria-pressed="false">Table finale</button><button type="button" data-r="win" aria-pressed="false">Victoire</button></div></div>
+     <label class="full">Main à revoir (optionnel)<textarea id="m" rows="2" placeholder="Position, tapis en BB, cartes, action à chaque street"></textarea></label>
+     <div class="row full"><button class="btn main" id="f-save">Enregistrer le tournoi</button><button type="button" class="btn" id="f-cancel" hidden>Annuler</button></div>
+    </form>
+   </div>
+   <div class="card"><div class="row" style="justify-content:space-between;align-items:center"><h2>Historique</h2><button class="btn" id="csv" hidden>Exporter en CSV</button></div><div class="tw"><table><thead><tr><th>Date</th><th>Heure</th><th>Tournoi</th><th>Buy-in</th><th>Gain</th><th>Net</th><th>Place</th><th></th></tr></thead><tbody id="rows"></tbody></table></div></div>
+   <div class="card" id="sauv-card" hidden><h2>Sauvegardes</h2>
+    <p class="mute">Tes données sont dans <b>%APPDATA%\GrindPoker\carnet.json</b>. Une copie datée est prise automatiquement (au plus une par quart d'heure, vingt conservées).</p>
+    <div class="row"><button class="btn" id="sauv-now">Sauvegarder maintenant</button></div>
+    <div class="tw" style="margin-top:10px"><table><thead><tr><th>Copie</th><th>Taille</th><th></th></tr></thead><tbody id="sauv-list"></tbody></table></div></div>
+   <div class="card"><h2>Journal de mains</h2><div id="hands" class="mute">Aucune main notée. Remplis « Main à revoir » en ajoutant un tournoi.</div></div>
+  </section>
+
+  <!-- ===== STATS ===== -->
+  <section class="view" id="v-stats" hidden>
+   <h1>Statistiques</h1>
+   <div class="seg" id="period"><button data-p="7" aria-pressed="false">7 jours</button><button data-p="30" aria-pressed="false">30 jours</button><button data-p="0" aria-pressed="true">Tout</button></div>
+   <div class="grid2">
+    <div class="card"><h2>Par tournoi</h2><div class="tw"><table><thead><tr><th>Type</th><th>Nb</th><th>Net</th><th>ROI</th></tr></thead><tbody id="bytype"></tbody></table></div></div>
+    <div class="card"><h2>Par horaire</h2><div class="tw"><table><thead><tr><th>Créneau</th><th>Nb</th><th>Net</th><th>ROI</th></tr></thead><tbody id="byhour"></tbody></table></div></div>
+   </div>
+   <div class="card"><h2>Par résultat</h2><div class="tw"><table><thead><tr><th>Résultat</th><th>Nb</th><th>Part</th></tr></thead><tbody id="byres"></tbody></table></div><p class="mute">Des conclusions fiables demandent 200 à 300 tournois.</p></div>
+  </section>
+
+  <!-- ===== ÉCOLE : cours, théorie et exercices en questions ===== -->
+  <section class="view" id="v-ecole" hidden>
+   <h1>École</h1>
+   <div class="seg" id="ecole-tabs" role="tablist">
+    <button data-p="cours" aria-pressed="true">Cours</button><button data-p="guide" aria-pressed="false">Que faire ? (guide)</button><button data-p="exos" aria-pressed="false">Exercices</button></div>
+   <div id="p-cours" style="display:grid;gap:18px">
+    <div class="prog"><span id="progtxt2">0/12 cours terminés</span><div class="bar"><i id="progbar" style="width:0%"></i></div></div>
+    <nav class="lessons" id="nav" role="tablist" aria-label="Cours"></nav>
+    <article class="card" id="lesson"></article>
+   </div>
+   <div id="p-guide" style="display:grid;gap:18px" hidden>
+   <div class="card">
+    <h2>Que faire ? · avant le flop</h2>
+    <p class="mute">Choisis ta situation : la grille montre l'action pour chaque main.</p>
+    <form onsubmit="return false"><label>Mon tapis<select id="g-st"><option value="deep">40 BB et plus</option><option value="mid">20 à 40 BB</option><option value="short">12 à 20 BB</option><option value="push">moins de 12 BB</option></select></label>
+     <label>Ma position<select id="g-pos"><option>UTG</option><option>HJ</option><option>CO</option><option selected>BTN</option><option>SB</option><option>BB</option></select></label>
+     <label class="full">Ce qui s'est passé avant moi<select id="g-sit"><option value="none">Personne n'a joué</option><option value="limp">Un ou plusieurs limps</option><option value="open">Une relance</option><option value="threebet">On 3-bet ma relance</option><option value="shove">Un tapis</option></select></label>
+     <label id="g-op-l" hidden>Qui a relancé ?<select id="g-op"><option>UTG</option><option>HJ</option><option selected>CO</option><option>BTN</option><option>SB</option></select></label>
+     <label id="g-sv-l" hidden>Tapis adverse<select id="g-sv"><option value="8">10 BB ou moins</option><option value="15" selected>Plus de 10 BB</option></select></label></form>
+    <div id="g-out"></div>
+   </div>
+   <div class="card">
+    <h2>Que faire ? · après le flop</h2>
+    <form onsubmit="return false"><label class="full">Ma main<select id="p-h"><option value="monster">Très forte : set, deux paires, quinte, couleur</option><option value="top">Top paire bon kicker / overpaire</option><option value="mid">Paire moyenne ou top paire kicker faible</option><option value="draw">Tirage fort (8 outs et plus)</option><option value="weak">Petit tirage (ventrale, 2 overcards)</option><option value="air">Rien</option></select></label>
+     <label class="full">Situation<select id="p-s"><option value="init">J'ai relancé avant le flop, c'est à moi</option><option value="check">On a checké vers moi</option><option value="bet">On mise sur moi</option><option value="raise">On relance ma mise</option></select></label>
+     <label style="display:flex;gap:8px;align-items:center" class="full"><input type="checkbox" id="p-m" style="width:auto"> 3 joueurs ou plus dans le coup</label></form>
+    <div id="p-out"></div>
+    <h3>Si tu hésites encore</h3><ul><li>Ma main bat-elle ce que l'adversaire joue <i>de cette façon</i> ?</li><li>Un joueur passif qui mise gros = main forte. Crois-le.</li><li>Tirage : compare tes chances à la cote (exercice « Cotes »).</li><li>Dans le doute face à une grosse mise : jeter coûte moins cher que payer.</li></ul>
+   </div>
+   </div>
+   <div id="p-exos" hidden>
+    <div class="card">
+     <h2>Exercices de théorie</h2>
+     <p class="mute">Questions illimitées pour fixer la théorie. Le chrono se règle dans Entraînement.</p>
+     <div class="seg" id="e-modes" style="margin:12px 0">
+      <button data-m="mix" aria-pressed="true">Mixte</button><button data-m="preflop" aria-pressed="false">Préflop</button><button data-m="postflop" aria-pressed="false">Après le flop</button><button data-m="odds" aria-pressed="false">Cotes et tirages</button><button data-m="cours" aria-pressed="false">Questions de cours</button></div>
+     <div class="train" id="e-box"></div>
+    </div>
+   </div>
+  </section>
+
+  <!-- ===== ENTRAÎNEMENT : mises en situation réelles sur la table ===== -->
+  <section class="view" id="v-entrainement" hidden>
+   <h1>Entraînement</h1>
+   <div class="card">
+    <h2>À la table</h2>
+    <div class="prog"><span id="tgoal">0 / 50<span class="mute"> décisions aujourd'hui</span></span><div class="bar"><i id="tgoalbar" style="width:0%"></i></div></div>
+    <div class="row" style="align-items:end;margin:12px 0">
+     <label style="max-width:220px">Chrono par décision<select id="t-chrono"><option value="0">Sans chrono</option><option value="15">15 secondes</option><option value="10">10 secondes</option><option value="7">7 secondes (expert)</option></select></label>
+     <div class="seg" id="t-modes"><button data-m="weak" aria-pressed="true">🎯 Mes points faibles</button><button data-m="mix" aria-pressed="false">Tout</button><button data-m="scenario" aria-pressed="false">Coups complets</button><button data-m="preflop" aria-pressed="false">Préflop</button><button data-m="postflop" aria-pressed="false">Après le flop</button><button data-m="errors" aria-pressed="false">Rejouer mes erreurs</button><button data-m="eval" aria-pressed="false">Évaluation (20 décisions)</button></div></div>
+    <div class="train" id="t-box"></div>
+   </div>
+   <div class="card">
+    <h2>Mon niveau</h2>
+    <div class="hero-lv" id="hero-lv"></div>
+    <p class="mute">Score sur tes 100 dernières décisions à la table : 60 % justesse + 40 % décisions justes en 10 s ou moins. L'évaluation (20 décisions, tous thèmes, chrono 10 s) donne un bilan ponctuel.</p>
+   </div>
+   <div class="grid2">
+    <div class="card"><h2>Progression (14 jours)</h2><div class="legend"><span><i style="background:var(--felt)"></i>Décisions justes</span><span><i style="background:var(--gold)"></i>Justes en ≤ 10 s</span></div>
+     <div class="tw"><svg id="prog-chart" viewBox="0 0 640 180" width="100%" role="img" aria-label="Progression sur 14 jours"></svg></div></div>
+    <div class="card"><h2>Points faibles</h2><div id="weak"></div><p class="mute">Le mode « Mes points faibles » te propose surtout ces thèmes.</p></div>
+   </div>
+   <div class="card"><h2>Mes erreurs récentes</h2><div id="misses"></div><p class="mute">Une erreur disparaît quand tu rejoues la situation correctement (mode « Rejouer mes erreurs »).</p></div>
+   <div class="card"><h2>Évaluations</h2><div class="tw"><table><thead><tr><th>Date</th><th>Score</th><th>Niveau</th><th>Justes</th></tr></thead><tbody id="evals"></tbody></table></div></div>
+   <div class="card"><h2>Mes résultats</h2><div class="tw"><table><thead><tr><th>Exercice</th><th>Réponses</th><th>Réussite</th><th>Temps moyen</th><th>Juste en ≤ 10 s</th></tr></thead><tbody id="tstats"></tbody></table></div><p class="mute">Objectif final : plus de 80 % de décisions justes en 10 secondes ou moins. Commence à 15 s, puis descends à 10 s et 7 s.</p></div>
+  </section>
+
+  <!-- ===== RÈGLES ===== -->
+  <section class="view" id="v-regles" hidden>
+   <h1>Règles de bankroll</h1>
+   <div class="card">
+    <p class="mute">Monter : bankroll ≥ 100 buy-ins du niveau suivant. Redescendre : bankroll &lt; 80 buy-ins du niveau actuel.</p>
+    <div class="tw"><table><thead><tr><th>Buy-in</th><th>Monter à</th><th>Redescendre sous</th><th>Max par session</th></tr></thead><tbody id="ladder"></tbody></table></div>
+   </div>
+   <div class="card"><h2>Discipline</h2><ul>
+    <li><b>Sous 25 €</b> : pause et revue des mains avant de reprendre.</li>
+    <li>Stop après 3 sessions (jours) perdantes d'affilée.</li>
+    <li>À chaque montée, joue d'abord moitié ancien niveau, moitié nouveau.</li>
+    <li>Avant de monter : 16/20 au quiz final de l'École.</li>
+    <li>Volume visé : 20 tournois par semaine, 2-3 en parallèle maximum.</li></ul></div>
+  </section>
+ </main>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script>
+// =====================================================================
+// PLATEFORME : un seul code pour trois façons d'ouvrir Grind Poker
+//  1. le logiciel Windows (desktop/) : données dans un fichier,
+//     %APPDATA%\GrindPoker\carnet.json, via /api/donnees, avec sauvegardes ;
+//  2. la version en ligne sur claude.ai : capacités window.claude ;
+//  3. un simple navigateur (index.html ouvert tel quel) : stockage local.
+// useCap(nom) renvoie la même interface dans les trois cas.
+// =====================================================================
+const CLE_LOCALE='grind-poker-carnet';
+let MODE_STOCKAGE='local';
+function carnetLocal(){
+ let carnet={sessions:{},progress:{}};const abonnes={};
+ // Lecture : fichier du logiciel d'abord, puis stockage du navigateur
+ const lire=async()=>{
+  if(location.protocol!=='file:'){
+   const natif=location.hostname==='127.0.0.1';
+   try{
+    const r=await fetch('api/donnees',{cache:'no-store'});
+    if(r.ok && (natif || (r.headers.get('content-type')||'').includes('json'))){
+     const d=await r.json();MODE_STOCKAGE='api';return d;
+    }
+    if(natif && r.status!==404)throw Error('Carnet indisponible');
+   }catch(err){if(natif)throw err}
+  }
+ return JSON.parse(localStorage.getItem(CLE_LOCALE))||{};
+ };
+ const pret=lire().then(d=>{carnet={sessions:d.sessions||{},progress:d.progress||{}}});
+ let file=pret.catch(()=>{});
+ const modifier=(collection,id,valeur)=>{
+  const operation=file.then(async()=>{
+   await pret;
+   const docs={...carnet[collection]};
+   if(valeur===undefined)delete docs[id];else docs[id]=valeur;
+   const suivant={...carnet,[collection]:docs},corps=JSON.stringify(suivant);
+   if(MODE_STOCKAGE==='api'){
+    const r=await fetch('api/donnees',{method:'PUT',headers:{'Content-Type':'application/json'},body:corps});
+    if(!r.ok)throw Error('Écriture refusée ('+r.status+')');
+   }else localStorage.setItem(CLE_LOCALE,corps);
+   carnet=suivant;emettre(collection);
+  });
+  file=operation.catch(()=>{});return operation;
+ };
+ const emettre=c=>(abonnes[c]||[]).forEach(f=>f({docs:Object.entries(carnet[c]||{}).map(([id,data])=>({id,data}))}));
+ const doc=chemin=>{const[c,id]=chemin.split('/');return{
+  get:async()=>{await pret;const d=(carnet[c]||{})[id];return{exists:!!d,data:d}},
+  set:v=>modifier(c,id,v),
+  delete:()=>modifier(c,id,undefined)}};
+ return{doc,collection:c=>({onSnapshot:f=>{(abonnes[c]??=[]).push(f);pret.then(()=>emettre(c)).catch(()=>toast('Lecture du carnet impossible. Rouvre l’application pour réessayer.'))}})}}
+// Export de fichier hors claude.ai : téléchargement classique (WebView2 et navigateurs)
+const telechargementLocal={save:async({filename,data})=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([data],{type:'text/csv'}));a.download=filename;document.body.appendChild(a);a.click();a.remove();return{status:'saved'}}};
+function useCap(nom){
+ if(window.claude&&typeof window.claude.use==='function')return window.claude.use(nom);
+ return Promise.resolve(nom==='db'?carnetLocal():nom==='downloads'?telechargementLocal:null)}
+</script>
+<script>
+// =====================================================================
+// ÉCOLE : outils, ranges, contenu des cours, quiz et entraînements
+// =====================================================================
+// ===== Outils : grille de mains 13x13 =====
+const R='AKQJT98765432';
+// Transforme une range texte ("22+, A2s+, KTo+, 98s") en ensemble de mains
+const _parsed={};
+function parse(str){if(_parsed[str])return _parsed[str];const set=_parsed[str]=new Set();
+ str.split(',').map(s=>s.trim()).filter(Boolean).forEach(t=>{
+  const plus=t.endsWith('+'),h=t.replace('+','');
+  if(h.length===2){const i=R.indexOf(h[0]);for(let k=plus?0:i;k<=i;k++)set.add(R[k]+R[k]);return}
+  const a=R.indexOf(h[0]),b=R.indexOf(h[1]),sf=h[2];
+  if(h[1]==='x'){for(let k=a+1;k<13;k++)set.add(h[0]+R[k]+sf);return}
+  for(let k=plus?a+1:b;k<=b;k++)set.add(h[0]+R[k]+sf);});
+ return set}
+function gridHTML(str){const s=parse(str);let n=0,out='';
+ for(let i=0;i<13;i++)for(let j=0;j<13;j++){const hand=i===j?R[i]+R[j]:i<j?R[i]+R[j]+'s':R[j]+R[i]+'o',c=i===j?'p':i<j?'s':'o',on=s.has(hand);
+  if(on)n+=i===j?6:i<j?4:12;out+=`<div class="${on?'in ':''}${c}" title="${hand}">${hand.replace(/[so]$/,'')}</div>`}
+ return{html:out,pct:(n/1326*100).toFixed(0)}}
+function chartBlock(id,charts){return `<label class="mute">Situation : <select id="${id}">${Object.keys(charts).map(k=>`<option>${k}</option>`).join('')}</select></label>
+ <div class="legend"><span><i style="background:var(--pair)"></i>paire</span><span><i style="background:var(--suit)"></i>assortie (haut)</span><span><i style="background:var(--felt)"></i>dépareillée (bas)</span><span id="${id}-pct"></span></div>
+ <div class="chartwrap"><div class="tw"><div class="grid" id="${id}-g"></div></div><div id="${id}-tbl"></div></div>
+ <div class="detail" id="${id}-d">Touche une case pour voir la main et l'action.</div>`}
+// Affiche la grille, le schéma de table et le détail de la case touchée
+function bindChart(id,charts){const sel=document.getElementById(id),$g=document.getElementById(id+'-g'),$d=document.getElementById(id+'-d');
+ const up=()=>{const g=gridHTML(charts[sel.value]);$g.innerHTML=g.html;document.getElementById(id+'-pct').textContent='≈ '+g.pct+' % des mains';
+  document.getElementById(id+'-tbl').innerHTML=tableSVG(sel.value);$d.textContent='Touche une case pour voir la main et l\'action.'};
+ $g.onclick=e=>{const c=e.target.closest('div[title]');if(!c)return;const h=c.title,on=c.classList.contains('in');
+  $g.querySelectorAll('.sel').forEach(x=>x.classList.remove('sel'));c.classList.add('sel');
+  $d.innerHTML=`<b>${handName(h)}</b> · ${sel.value} → <b>${on?'JOUER':'JETER'}</b>`};
+ sel.onchange=up;up()}
+// Nom lisible d'une main : "A5s" → "A5 assorties"
+function handName(h){return h.length===2?'Paire de '+h[0]:h.slice(0,2)+(h[2]==='s'?' assorties':' dépareillées')}
+// Schéma de table 6-max : met en évidence la position citée dans la situation
+const POS=['UTG','HJ','CO','BTN','SB','BB'];
+function posOf(s){return POS.find(p=>new RegExp('\\b'+p+'\\b').test(s))||(/bouton/i.test(s)?'BTN':null)}
+function tableSVG(sit){const me=posOf(sit);
+ let g='<svg viewBox="0 0 240 160" width="220" role="img" aria-label="Table 6-max, position '+(me||'')+'"><ellipse cx="120" cy="80" rx="92" ry="52" fill="#0f3d27" stroke="#e0bb62" stroke-width="3"/><ellipse cx="120" cy="80" rx="80" ry="42" fill="#1c6b45"/><text x="120" y="84" text-anchor="middle" font-size="10" fill="#e0bb62" letter-spacing="2">6-MAX</text>';
+ POS.forEach((p,i)=>{const a=Math.PI/2+i*Math.PI/3,x=120+100*Math.cos(a),y=80+62*Math.sin(a),on=p===me;
+  g+=`<circle cx="${x}" cy="${y}" r="16" fill="${on?'#e0bb62':'#f4efe2'}" stroke="${on?'#fff':'#0f3d27'}" stroke-width="2"/><text x="${x}" y="${y+3.5}" text-anchor="middle" font-size="10" font-weight="700" fill="#16201a">${p}</text>`});
+ return g+'</svg>'}
+
+// ===== Ranges (approximations simplifiées pour micro-limites) =====
+const OPEN={
+ 'UTG (sous le pistolet)':'22+, A2s+, KTs+, QTs+, JTs, T9s, 98s, AJo+, KQo',
+ 'HJ':'22+, A2s+, K9s+, Q9s+, J9s+, T9s, 98s, 87s, ATo+, KJo+, QJo',
+ 'CO (cut-off)':'22+, A2s+, K7s+, Q8s+, J8s+, T8s+, 97s+, 87s, 76s, 65s, A9o+, KTo+, QTo+, JTo',
+ 'BTN (bouton)':'22+, A2s+, K2s+, Q5s+, J7s+, T7s+, 96s+, 85s+, 75s+, 64s+, 54s, A2o+, K9o+, Q9o+, J9o+, T9o, 98o',
+ 'SB (petite blinde)':'22+, A2s+, K5s+, Q7s+, J7s+, T7s+, 97s+, 86s+, 76s, 65s, A5o+, K9o+, Q9o+, J9o+, T9o'};
+const THREEBET={
+ '3-bet valeur vs UTG':'QQ+, AKs, AKo',
+ '3-bet vs CO/BTN':'TT+, AJs+, KQs, AQo+, A5s, A4s',
+ 'Payer en BB vs BTN (2,2 BB)':'22+, A2s+, K2s+, Q4s+, J6s+, T6s+, 96s+, 85s+, 74s+, 63s+, 53s+, 43s, A2o+, K7o+, Q8o+, J8o+, T8o+, 98o, 87o'};
+const PUSH={
+ '10 BB – UTG':'22+, A2s+, A7o+, K9s+, KJo+, QTs+, JTs',
+ '10 BB – CO':'22+, A2s+, A4o+, K7s+, KTo+, Q9s+, QJo, J9s+, T9s',
+ '10 BB – BTN':'22+, A2s+, A2o+, K5s+, K9o+, Q8s+, QTo+, J8s+, JTo, T8s+, 98s',
+ '10 BB – SB (vs BB)':'22+, A2s+, A2o+, K2s+, K5o+, Q5s+, Q9o+, J7s+, J9o+, T7s+, T9o, 97s+, 87s',
+ '15 BB – UTG':'55+, A9s+, AJo+, KQs',
+ '15 BB – BTN':'22+, A2s+, A8o+, K9s+, KJo+, QTs+, JTs',
+ '15 BB – SB (vs BB)':'22+, A2s+, A5o+, K8s+, KTo+, Q9s+, QJo, J9s+, T9s'};
+
+// ===== Contenu des cours =====
+const L=[
+{t:'1. Ouvertures 6-max',h:`<h2>Quelles mains ouvrir selon ta position</h2>
+<p>En 6-max, il y a moins de joueurs derrière toi qu'en table pleine, donc tu peux ouvrir plus large. Plus tu es proche du bouton, plus ta range s'élargit, car tu joueras le coup en position après le flop.</p>
+<div class="tip">Taille d'ouverture : 2 à 2,2 BB en début de tournoi (Monster Stack), 2 BB quand les tapis baissent. Si un joueur a limpé devant toi : 3 BB + 1 BB par limper.</div>
+<h3>Grille d'ouverture (premier à parler)</h3>${chartBlock('c1',OPEN)}
+<h3>À retenir</h3><ul><li>Hors de ces mains, on jette ; on ne limpe pas.</li><li>Les mains assorties connectées (87s, 65s) gagnent de la valeur au bouton et au cut-off.</li><li>Les As faibles dépareillés (A5o) sont des pièges en début de parole.</li></ul>`,
+q:[['Tu es UTG avec KJo. Que fais-tu ?',['Ouvrir','Limper','Jeter'],2,'KJo est trop faible UTG avec 5 joueurs derrière : il est souvent dominé par AJ, KQ, AK.'],
+['Tu es au bouton, tout le monde a passé, tu as 76s.',['Ouvrir à 2,2 BB','Limper','Jeter'],0,'Au bouton, 76s est une ouverture standard : tu joues en position et tu voles souvent les blinds.'],
+['Deux joueurs ont limpé, tu as AQo au CO.',['Relancer à 5 BB','Payer','Relancer à 2 BB'],0,'3 BB + 1 BB par limper = 5 BB. On isole avec une main forte.']]},
+
+{t:'2. 3-bet et défense BB',h:`<h2>Relancer, payer ou jeter face à une ouverture</h2>
+<p>À 0,25 €, les joueurs ne se couchent pas assez face aux 3-bets et paient avec des mains trop faibles. La stratégie simple : <b>3-bet surtout pour la valeur</b>, avec quelques bluffs contre les ouvertures larges (CO, BTN).</p>
+<div class="tip">Taille du 3-bet : 3 fois l'ouverture en position, 3,5 à 4 fois hors position.</div>
+<h3>Grilles</h3>${chartBlock('c2',THREEBET)}
+<h3>Défense de la grosse blinde</h3><ul><li>Tu as déjà mis 1 BB : face à une ouverture de 2,2 BB, il te suffit de gagner environ 27 % du temps pour payer.</li><li>Défends large contre le bouton et la petite blinde, serré contre UTG.</li><li>Après le flop, hors position, joue simple : check-call avec tes tirages et paires moyennes, check-raise avec tes très fortes mains.</li></ul>`,
+q:[['UTG ouvre, tu as AJo au bouton.',['3-bet','Payer ou jeter selon le joueur','Tapis'],1,'AJo est dominé par la range UTG (AQ, AK). Payer contre un joueur passif, jeter sinon. Pas de 3-bet.'],
+['Le bouton ouvre à 2 BB, tu es en BB avec K7o.',['Jeter','Payer','3-bet'],1,'K7o se défend contre une ouverture bouton : bon prix et range adverse large.'],
+['Pourquoi peu de 3-bet bluffs à 0,25 € ?',['Les joueurs se couchent trop','Les joueurs paient trop','C\'est interdit'],1,'Ils paient trop : le bluff perd de la valeur, la valeur en gagne.']]},
+
+{t:'3. Postflop de base',h:`<h2>Jouer après le flop</h2>
+<h3>Continuation bet (c-bet)</h3><p>Tu as relancé avant le flop : mise petit (un tiers du pot) sur les boards secs (K72 dépareillé), plus gros (deux tiers) ou check sur les boards connectés (987 bicolore), qui aident plus ton adversaire.</p>
+<h3>Value bet</h3><p>Avec une main forte, mise gros à chaque street. À ce niveau, la plus grande source de gains est de se faire payer par des mains moyennes.</p>
+<h3>Quand abandonner</h3><ul><li>Un joueur passif qui relance à la river a presque toujours une très grosse main : couche les paires moyennes.</li><li>Ne paie pas trois streets avec une seule paire faible.</li><li>Sans main et sans tirage après une mise adverse : abandonne.</li></ul>
+<div class="tip">Compte tes outs : tirage couleur = 9 outs ≈ 35 % sur deux cartes, ≈ 19 % sur une carte. Règle rapide : outs × 4 au flop, outs × 2 au turn.</div>`,
+q:[['Tu relances avec AQ, le flop est K72 dépareillé, 1 adversaire.',['C-bet petit (1/3)','Check','Tapis'],0,'Board sec favorable à ta range : un petit c-bet suffit.'],
+['Tirage couleur au turn : quelle chance de toucher à la river ?',['≈ 9 %','≈ 19 %','≈ 35 %'],1,'9 outs × 2 ≈ 18-19 %.'],
+['River : un joueur très passif relance ta mise. Tu as une paire max, kicker moyen.',['Relancer','Payer','Coucher le plus souvent'],2,'Les joueurs passifs relancent la river avec des mains qui battent une paire.']]},
+
+{t:'4. Exploiter les micro',h:`<h2>Les erreurs des joueurs à 0,25 € et comment en profiter</h2>
+<div class="tw"><table><thead><tr><th>Erreur fréquente</th><th>Ta réponse</th></tr></thead><tbody>
+<tr><td>Limp avec beaucoup de mains</td><td>Isoler avec une range forte, miser en value</td></tr>
+<tr><td>Paie trop (calling station)</td><td>Ne jamais bluffer, value bet plus gros et plus fin</td></tr>
+<tr><td>Bluffe peu, mise gros = main forte</td><td>Croire les grosses mises, coucher les mains moyennes</td></tr>
+<tr><td>Tapis trop large en fin de tournoi</td><td>Payer plus large avec les As et les paires</td></tr>
+<tr><td>Joue trop de mains en début de tournoi</td><td>Rester solide, attendre les spots de value</td></tr>
+<tr><td>Tilt après un bad beat</td><td>Cibler ce joueur les tours suivants</td></tr></tbody></table></div>
+<div class="tip">Utilise les notes Winamax : un mot par joueur (« station », « nit », « tapis large »). C'est un gros avantage sur des centaines de tournois.</div>`,
+q:[['Un joueur paie toutes tes mises jusqu\'à la river. Tu n\'as rien.',['Grosse mise de bluff','Check','Petite mise'],1,'On ne bluffe pas une calling station.'],
+['Même joueur, tu as la paire max.',['Mise petite','Mise grosse','Check'],1,'Il paie trop : mise gros en value.'],
+['Meilleure source de gains à ce niveau ?',['Bluffs','Value bets','Slowplay'],1,'La value contre des joueurs qui paient trop.']]},
+
+{t:'5. Push/fold',h:`<h2>Jouer avec un tapis court</h2>
+<p>Sous environ 15 BB, relancer puis se coucher coûte trop cher. Tu joues donc <b>tapis ou fold</b> quand personne n'a ouvert devant toi.</p>
+<ul><li>Sous 10 BB : tapis direct avec les ranges ci-dessous.</li><li>Entre 12 et 20 BB : tapis ou petite relance avec les meilleures mains, et re-tapis sur les ouvertures adverses.</li><li>Les antes rendent le vol de blindes plus rentable : pousse plus large qu'on ne le pense.</li></ul>
+<h3>Ranges de tapis (approx. Nash, premier à parler)</h3>${chartBlock('c5',PUSH)}
+<div class="tip">Pour payer un tapis, il faut une main plus serrée que pour pousser : tu n'as pas l'avantage de faire coucher l'adversaire.</div>`,
+q:[['10 BB au bouton, A4o, personne n\'a joué.',['Tapis','Relancer 2 BB','Jeter'],0,'A4o fait partie de la range de push au bouton à 10 BB.'],
+['15 BB UTG avec K9s.',['Tapis','Jeter','Limper'],1,'Trop faible UTG à 15 BB.'],
+['Pourquoi pousser plutôt que relancer à 8 BB ?',['Pour faire joli','Relancer puis coucher coûte trop cher','Winamax l\'impose'],1,'Une relance puis un fold perd une grosse part du tapis.']]},
+
+{t:'6. Bulle et ICM',h:`<h2>Quand l'argent approche</h2>
+<p>L'<b>ICM</b> dit qu'en tournoi, les jetons perdus valent plus que les jetons gagnés : sortir juste avant l'argent coûte cher. Tout le monde le sent, donc beaucoup de joueurs jouent trop serré à la bulle.</p>
+<ul><li><b>Gros tapis</b> : attaque ! Relance souvent, surtout les tapis moyens qui ont peur de sortir.</li><li><b>Tapis moyen</b> : évite les confrontations avec les plus gros tapis ; resserre tes paiements de tapis.</li><li><b>Tout petit tapis</b> : si tu es certain d'atteindre l'argent en foldant, fold ; sinon pousse avant d'être trop court.</li></ul>
+<div class="tip">À 0,25 €, le premier prix payé est souvent proche du buy-in. La vraie valeur est dans le haut du classement : ne sacrifie pas tout pour « rentrer dans l'argent ».</div>`,
+q:[['Bulle, tu es gros tapis. Les autres jouent serré.',['Resserrer','Relancer plus souvent','Attendre les As'],1,'Tu mets la pression sur ceux qui ont peur de sortir.'],
+['Tapis moyen, le chip leader pousse. Tu as AJo.',['Payer','Coucher le plus souvent','Toujours payer avec un As'],1,'L\'ICM pénalise les paiements risqués contre le gros tapis.'],
+['Min-cash à 0,25 € : pourquoi ne pas trop le viser ?',['Il ne rapporte presque rien','Il est interdit','Il est taxé'],0,'L\'argent se gagne en haut du classement.']]},
+
+{t:'7. Table finale',h:`<h2>Gérer la table finale</h2>
+<p>Chaque place gagnée augmente le prix : c'est là que se fait l'essentiel de ton ROI en MTT.</p>
+<ul><li>Observe les tapis avant chaque décision : qui peut t'éliminer, qui est en danger.</li><li>Les petits tapis qui vont sortir te font gagner des places sans rien faire : évite de les sauver en jouant des coups marginaux.</li><li>À 3 ou 2 joueurs, les ranges s'élargissent énormément : joue beaucoup de mains, surtout au bouton.</li><li>En tête-à-tête, pousse ou relance quasiment toutes les mains depuis le bouton avec un tapis court.</li></ul>
+<div class="tip">Ne fais pas de deal par peur : à 0,25 €, les écarts sont petits en euros mais comptent beaucoup pour ta bankroll de 35 €.</div>`,
+q:[['À 3 joueurs, tu dois ouvrir…',['Plus serré','Plus large','Pareil qu\'à 6'],1,'Moins de joueurs = mains moyennes plus fortes.'],
+['Un joueur a 2 BB, tu as 25 BB, un autre gros tapis attaque.',['Payer large','Rester prudent','Pousser tout'],1,'Laisse le très petit tapis sortir pour monter de place.'],
+['Où se fait l\'essentiel du ROI en MTT ?',['Au début','À la bulle','En table finale'],2,'Les prix augmentent fortement en haut du classement.']]},
+
+{t:'8. Mental et tilt',h:`<h2>Gérer la variance</h2>
+<p>En MTT à 0,25 €, perdre 20 ou 30 tournois d'affilée est normal, même pour un bon joueur. Ta bankroll de 100 buy-ins sert à encaisser ça.</p>
+<ul><li><b>Juge tes décisions, pas tes résultats.</b> Un tapis avec AA qui perd contre 72o était une bonne décision.</li><li>Signes de tilt : envie de « se refaire », mains jouées plus vite, paiements « pour voir ». → pause de 10 min ou fin de session.</li><li>Respecte le plafond de session et la règle des 3 sessions perdantes (voir le tracker).</li><li>Maximum 2 ou 3 tournois en même temps au début.</li><li>Après chaque session, note une main à revoir : c'est la progression la plus rapide.</li></ul>
+<div class="tip">Routine : 5 min d'échauffement (relis un cours), session, 5 min de revue. Le poker est un marathon.</div>`,
+q:[['Tu perds 15 tournois d\'affilée.',['Monter de limite pour se refaire','C\'est normal, respecter les règles','Arrêter le poker'],1,'La variance MTT est énorme : reste discipliné.'],
+['Tu perds AA contre 72o en tapis préflop.',['Mauvaise décision','Bonne décision, mauvais résultat','Il fallait limper'],1,'Tu étais énorme favori : c\'est la bonne décision.'],
+['Combien de tournois en parallèle au début ?',['2 ou 3','8','12'],0,'Moins de tables = meilleures décisions.']]},
+
+{t:'9. Tailles de mise',h:`<h2>Lire et choisir les tailles de mise</h2>
+<p>À 0,25 €, la taille d'une mise dit beaucoup de la main. Les joueurs récréatifs misent petit avec des mains moyennes ou des tirages, et gros avec des mains très fortes.</p>
+<div class="tw"><table><thead><tr><th>Taille adverse</th><th>Ce que ça signifie souvent</th></tr></thead><tbody>
+<tr><td>Mini-mise (≈ 1/4 pot)</td><td>Main moyenne qui veut voir la carte suivante pas cher</td></tr>
+<tr><td>1/2 à 2/3 pot</td><td>Mise standard, range large</td></tr>
+<tr><td>Pot ou plus au turn/river</td><td>Très forte main chez la majorité des joueurs</td></tr>
+<tr><td>Min-raise au flop</td><td>Souvent une main faite forte, rarement un bluff</td></tr></tbody></table></div>
+<h3>Tes propres tailles</h3><ul><li>Value : 2/3 à pot, les adversaires paient trop.</li><li>Bluff (rare) : même taille que ta value, pour ne pas te trahir.</li><li>Pot committed : si miser engage plus d'un tiers de ton tapis, prépare-toi à aller au tapis.</li></ul>`,
+q:[['Un joueur passif mise pot à la river.',['Souvent un bluff','Souvent une très forte main','Aucune info'],1,'Les joueurs récréatifs misent gros avec leurs grosses mains.'],
+['Quelle taille pour ta value à 0,25 € ?',['1/4 pot','2/3 à pot','Toujours tapis'],1,'Ils paient trop : mise gros.'],
+['Tu bluffes à la river : quelle taille ?',['La même que ta value','Minimum','Aucune importance'],0,'Des tailles différentes révèlent ta main.']]},
+
+{t:'10. Deep stack',h:`<h2>Le début de Monster Stack (100 BB et plus)</h2>
+<p>Les Monster Stack commencent avec un gros tapis et des niveaux lents. C'est le moment où les joueurs faibles perdent le plus.</p>
+<ul><li>Joue les petites paires et les assorties connectées en position pour toucher gros (set, couleur) : à 100 BB, tu te fais payer.</li><li>Une paire max n'est pas une main pour mettre 100 BB dans le pot : contrôle la taille du pot.</li><li>Paie une relance avec une petite paire si tu peux gagner 15× la mise quand tu touches ton set (≈ 12 %).</li><li>N'utilise pas encore le push/fold : tu as de la marge pour jouer après le flop.</li></ul>
+<div class="tip">Objectif de début de tournoi : doubler sans risque en prenant les tapis des joueurs faibles, pas survivre.</div>`,
+q:[['À 150 BB, tu as 55 et un joueur ouvre. Tu es au bouton.',['Payer pour toucher un set','Tapis','Toujours jeter'],0,'Les tapis profonds rendent le set mining rentable.'],
+['À 120 BB, tu as top paire kicker moyen, l\'adversaire relance chaque street.',['Aller au tapis','Contrôler / coucher souvent','Relancer encore'],1,'Une paire ne vaut pas 120 BB face à une agression forte.'],
+['Chance de toucher un set au flop avec une paire ?',['≈ 12 %','≈ 30 %','≈ 50 %'],0,'Environ 1 fois sur 8.']]},
+
+{t:'11. Coups multiway',h:`<h2>Jouer à 3 joueurs ou plus après le flop</h2>
+<p>Les coups à plusieurs sont fréquents à 0,25 € (limps, paiements larges). La règle change : il faut une main plus forte pour gagner.</p>
+<ul><li>Presque jamais de bluff à 3 ou plus : quelqu'un paie toujours.</li><li>C-bet beaucoup moins souvent, seulement avec une vraie main ou un gros tirage.</li><li>Une top paire faible perd souvent de la valeur en multiway : joue-la prudemment.</li><li>Les tirages aux nuts (couleur à l'As) gagnent de la valeur : le pot est gros.</li></ul>`,
+q:[['Flop à 4 joueurs, tu n\'as rien.',['C-bet 1/3','Check / abandon','Tapis'],1,'Trop de joueurs pour qu\'un bluff passe.'],
+['Tirage couleur max à 4 joueurs.',['Bon spot, pot gros','Toujours coucher','Tapis direct'],0,'Plus de joueurs = meilleure cote pour ton tirage.'],
+['Top paire kicker faible en multiway :',['Main de tapis','Main à jouer prudemment','Main à bluffer'],1,'Elle est souvent battue quand l\'argent rentre.']]},
+
+{t:'12. Petite blinde',h:`<h2>Jouer depuis la petite blinde</h2>
+<p>La SB est la pire position : tu joues hors position contre tout le monde après le flop.</p>
+<ul><li>Face à une ouverture : privilégie <b>3-bet ou fold</b> plutôt que payer (la BB derrière peut encore relancer).</li><li>Tout le monde a passé : relance (3 BB) ou fold ; limper est possible seulement contre une BB très passive.</li><li>En tapis court, la SB contre la BB est la situation de push la plus large (voir cours 5).</li></ul>
+<div class="tip">Payer en SB = jouer un coup hors position, souvent à 3 joueurs. C'est la fuite de jetons classique.</div>`,
+q:[['Le CO ouvre, tu es en SB avec KJo.',['Payer','3-bet ou fold','Tapis'],1,'En SB, évite de payer ; KJo se jette souvent ici.'],
+['Tout le monde passe, tu es SB avec A8o, 40 BB.',['Relancer 3 BB','Limper','Jeter'],0,'A8o est une relance standard contre la BB seule.'],
+['Pourquoi la SB est-elle la pire position ?',['Tu joues hors position','Tu mises en premier préflop','Tu as déjà payé 1 BB'],0,'Tu parles en premier sur chaque street après le flop.']]}];
+
+// ===== Fiches mémo (3 points par cours) =====
+const MEMO=[
+ ['Plus tu es proche du bouton, plus tu ouvres large.','Ouverture 2-2,2 BB ; isolation 3 BB + 1 par limper.','Jamais de limp : relance ou jette.'],
+ ['3-bet surtout pour la valeur à 0,25 €.','Défends large en BB contre BTN/SB, serré contre UTG.','3-bet ×3 en position, ×3,5-4 hors position.'],
+ ['C-bet petit sur board sec, prudent sur board connecté.','Value bet gros avec les mains fortes.','Outs ×4 au flop, ×2 au turn.'],
+ ['Ne bluffe pas les calling stations.','Crois les grosses mises des joueurs passifs.','Note chaque joueur en un mot.'],
+ ['Sous 15 BB : tapis ou fold.','Payer un tapis demande une main plus forte que pousser.','Les antes = vole plus large.'],
+ ['Gros tapis à la bulle : attaque.','Tapis moyen : évite le chip leader.','Le min-cash rapporte peu, vise le haut.'],
+ ['Surveille les tapis avant chaque décision.','Laisse sortir les tout petits tapis.','À 3 ou 2 joueurs, ouvre très large.'],
+ ['Juge tes décisions, pas tes résultats.','Tilt = pause ou fin de session.','2-3 tournois en parallèle maximum.'],
+ ['Grosse mise d\'un passif = grosse main.','Value 2/3 à pot.','Même taille en bluff qu\'en value.'],
+ ['Tapis profonds : set mining et connecteurs en position.','Une paire ne vaut pas 100 BB.','Règle du 15× pour payer avec une petite paire.'],
+ ['Pas de bluff à 3 joueurs ou plus.','C-bet rare en multiway.','Les tirages aux nuts prennent de la valeur.'],
+ ['SB : 3-bet ou fold face à une ouverture.','Seul face à la BB : relance.','Payer en SB = fuite de jetons.']];
+
+// ===== Scénarios d'entraînement (cours 3, 5, 6) : [question, options, bonne réponse, explication] =====
+const DRILLS={
+ 2:[['Tirage couleur au flop : chance de toucher d\'ici la river ?',['≈ 19 %','≈ 35 %','≈ 50 %'],1,'9 outs × 4 ≈ 36 %.'],
+  ['Tirage quinte par les deux bouts au turn (8 outs) : chance à la river ?',['≈ 16 %','≈ 32 %','≈ 8 %'],0,'8 × 2 = 16 %.'],
+  ['Quinte ventrale au flop (4 outs) : chance d\'ici la river ?',['≈ 16 %','≈ 8 %','≈ 30 %'],0,'4 × 4 = 16 %.'],
+  ['Tirage couleur + quinte bilatérale au flop (15 outs) : chance d\'ici la river ?',['≈ 30 %','≈ 54 %','≈ 75 %'],1,'Environ 54 % : tu es favori.'],
+  ['Au turn, pot 10 €, mise adverse 5 €. Il faut combien d\'équité pour payer ?',['≈ 25 %','≈ 33 %','≈ 50 %'],0,'5 / (10 + 5 + 5) = 25 %.'],
+  ['Pot 6 €, mise 6 € au turn, tu as un tirage couleur (19 %). Payer ?',['Oui','Non, sauf gains implicites importants'],1,'Il faut 33 % : 19 % ne suffit pas.'],
+  ['Deux overcards au flop (6 outs) : chance d\'ici la river ?',['≈ 24 %','≈ 12 %','≈ 40 %'],0,'6 × 4 = 24 % (outs pas toujours propres).']],
+ 4:[['Tu as 25 BB en BB. Un 10 BB pousse du bouton. Tu as A8o.',['Payer','Jeter'],0,'Face à une range de push large au bouton, A8o paie.'],
+  ['Tu as 20 BB en BB. Un UTG 12 BB pousse. Tu as KTo.',['Payer','Jeter'],1,'La range UTG est serrée : KTo est dominé.'],
+  ['SB 8 BB pousse sur toi en BB (tu as 30 BB). Tu as Q9o.',['Payer','Jeter'],0,'La SB pousse très large à 8 BB : Q9o paie.'],
+  ['CO 15 BB pousse. Tu es au bouton avec 22 et 40 BB.',['Payer','Jeter'],1,'Petite paire face à une range assez forte, et d\'autres joueurs derrière.'],
+  ['BTN 6 BB pousse, tu es en SB (40 BB) avec K7s.',['Payer','Jeter'],0,'À 6 BB, la range du bouton est énorme : K7s est largement devant.'],
+  ['Tu as 10 BB au CO avec 44, tout le monde passe.',['Tapis','Jeter'],0,'44 fait partie de la range de push CO à 10 BB.']],
+ 5:[['Bulle, tu as 12 BB (tapis moyen). Le chip leader pousse du BTN. Tu as AJo en BB.',['Payer','Jeter'],1,'ICM : le risque de sortir à la bulle coûte cher. AJo ne suffit pas ici.'],
+  ['Bulle, tu es chip leader au BTN. Les blindes sont des tapis moyens. Tu as J8o.',['Relancer','Jeter'],0,'Pression maximale sur les tapis moyens.'],
+  ['Bulle, 3 joueurs ont moins de 3 BB. Tu as 9 BB et 72o en BB, un tapis moyen pousse.',['Payer','Jeter'],1,'Les tout petits tapis vont sortir : laisse-les sauter.'],
+  ['Bulle, tu as 3 BB et tu es sous le pistolet avec K9o. Les autres ont 15+ BB.',['Tapis','Jeter'],0,'Tu ne passeras pas la bulle en foldant : pousse une main correcte.'],
+  ['Juste après la bulle, les joueurs se détendent. Tu as 20 BB.',['Rejouer normalement','Continuer à jouer serré'],0,'La pression ICM baisse : retour à ton jeu standard.']],
+ 3:[['Un joueur limpe puis paie ta relance. Flop A72, tu as AK. Il check.',['Miser gros pour la value','Check pour piéger'],0,'Contre un joueur qui paie trop, on mise en value.'],
+  ['Un joueur mise 1/4 pot sur un flop tricolore. Tu as un tirage couleur max.',['Payer ou relancer','Jeter'],0,'Petite mise = bon prix pour ton tirage.'],
+  ['Tu n\'as rien au river face à un joueur qui ne se couche jamais.',['Bluffer gros','Abandonner le coup'],1,'On ne bluffe pas une calling station.'],
+  ['Un joueur « nit » (très serré) 3-bet UTG. Tu as JJ.',['4-bet tapis','Payer ou jeter selon les tapis'],1,'La range d\'un nit est QQ+/AK : JJ est souvent derrière.'],
+  ['Tu vois un joueur payer 3 streets avec une hauteur As. Que noter ?',['« station »','« nit »'],0,'Il paie trop : note-le « station ».']],
+ 6:[['Table finale, 6 joueurs, tu es 2e tapis. Le 1er pousse, tu as 99.',['Payer','Jeter le plus souvent'],1,'Contre le seul tapis qui peut t\'éliminer, resserre fortement.'],
+  ['Table finale, tu es chip leader. Un court de 5 BB pousse du BTN, tu as K9o en BB.',['Payer','Jeter'],0,'Bon prix et range de push large : payer.'],
+  ['Tête-à-tête, 12 BB, tu es au bouton avec Q5o.',['Tapis','Jeter'],0,'En tête-à-tête à 12 BB, Q5o se pousse.'],
+  ['3 joueurs, tu as 20 BB au bouton avec A3o.',['Relancer ou tapis','Jeter'],0,'À 3 joueurs, A3o est une main forte.']],
+ 7:[['Tu viens de perdre un gros coup sur un bad beat.',['Faire une pause de quelques minutes','Rejouer tout de suite plus large'],0,'Pause : on évite les décisions sous l\'émotion.'],
+  ['Tu as atteint le plafond de session mais tu « le sens bien ».',['Continuer','S\'arrêter'],1,'La règle protège la bankroll, pas l\'intuition.'],
+  ['Une session gagnante grâce à des coolers favorables : bon jeu ?',['Pas forcément : revoir les décisions','Oui, forcément'],0,'On juge les décisions, pas le résultat.'],
+  ['Tu joues 6 tournois en même temps et rates des décisions.',['Réduire à 2-3','Ajouter des tables'],0,'Qualité avant volume.']],
+ 8:[['Joueur passif : check-check flop, puis mise pot au turn.',['Main forte probable','Bluff probable'],0,'Les joueurs passifs misent gros avec du solide.'],
+  ['Il reste 30 BB, pot de 12 BB. Tu veux miser 8 BB avec une paire max.',['Tu es presque engagé : prépare-toi au tapis','Tu peux te coucher sans souci'],0,'Plus d\'un tiers du tapis engagé : tu es « pot committed ».'],
+  ['Un joueur min-raise ta c-bet au flop.',['Souvent une main faite forte','Souvent un bluff'],0,'À ce niveau, les min-raises sont rarement des bluffs.'],
+  ['Tu value-bet à la river contre une station, taille ?',['2/3 à pot','1/4 pot'],0,'Elle paie : fais-lui payer cher.']],
+ 9:[['150 BB, 44 au CO, UTG ouvre à 2 BB.',['Payer (set mining)','Jeter'],0,'Tapis profonds : gains implicites énormes si set.'],
+  ['150 BB, A9o hors position face à une relance UTG.',['Jeter','Payer'],0,'Main dominée, hors position, tapis profonds : fold.'],
+  ['120 BB, 87s au bouton, le CO ouvre.',['Payer','Jeter'],0,'Assortie connectée en position, profond : bon call.'],
+  ['Tapis profonds, tu touches top paire kicker faible, l\'adversaire relance le turn.',['Contrôler / coucher','Tapis'],0,'Une main moyenne ne veut pas un gros pot profond.']],
+ 10:[['Flop à 3 joueurs, tu as un tirage quinte ventrale seul.',['Check/fold si ça mise','Bluffer'],0,'Tirage faible + multiway = abandon.'],
+  ['4 joueurs voient le flop, tu as un set.',['Miser pour la value','Slowplay'],0,'Beaucoup de mains peuvent payer, et des tirages sont là.'],
+  ['À 3, tu as la couleur au 2e rang (roi) et ça mise/relance devant toi.',['Prudence : l\'As peut être là','Tapis sans réfléchir'],0,'En multiway, les nuts sont souvent chez quelqu\'un.']],
+ 11:[['SB, tout le monde passe, 30 BB, tu as 94s. BB très agressive.',['Jeter','Limper'],0,'Contre une BB agressive, limper se fait attaquer : fold.'],
+  ['SB face à une ouverture BTN, tu as QQ.',['3-bet','Payer'],0,'3-bet pour la value et pour isoler.'],
+  ['SB face à une ouverture CO, tu as 76s.',['Jeter le plus souvent','Payer'],0,'Payer en SB = hors position, souvent à 3 : fold.'],
+  ['SB 10 BB, tout le monde passe, tu as K4o.',['Tapis','Jeter'],0,'SB contre BB à 10 BB : range de push très large.']],
+};
+
+// ===== Petits utilitaires =====
+const $=id=>document.getElementById(id);
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+const store={get(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}if(k!=='cours')syncProgress()}};
+// Retrouve une question par id : "l-k" (quiz) ou "dl-k" (entraînement)
+function getQ(id){const d=id[0]==='d',[l,k]=id.replace('d','').split('-').map(Number);return d?DRILLS[l][k]:L[l].q[k]}
+
+// ===== Erreurs (révision) =====
+let errs=new Set(store.get('erreursQ',[])),errHands=store.get('erreursMains',[]);
+function markErr(id,ok){ok?errs.delete(id):errs.add(id);store.set('erreursQ',[...errs]);updateBadges()}
+function markHand(sit,hand,inRange){errHands.unshift({sit,hand,inRange});errHands=errHands.slice(0,30);store.set('erreursMains',errHands);updateBadges()}
+
+// ===== Quiz générique : options mélangées, bouton Recommencer, enregistre les erreurs =====
+function quiz(box,ids,title,onDone){
+ const run=()=>{let score=0,n=0;const qs=ids.map(id=>{const q=getQ(id);return{id,q,order:shuffle(q[1].map((_,j)=>j))}});
+  box.innerHTML=`<h3>${title}</h3>`+qs.map((x,k)=>`<div class="q"><b>${x.q[0]}</b><div class="opts" data-k="${k}">${x.order.map(j=>`<button data-j="${j}">${x.q[1][j]}</button>`).join('')}</div><div class="exp"></div></div>`).join('')
+   +`<div class="qbar"><span class="score"></span><button class="again">Recommencer</button></div>`;
+  box.querySelector('.again').onclick=run;
+  box.querySelectorAll('.opts').forEach(o=>o.onclick=e=>{const b=e.target.closest('button');if(!b||o.dataset.done)return;o.dataset.done=1;
+   const x=qs[+o.dataset.k],ok=+b.dataset.j===x.q[2];n++;if(ok)score++;markErr(x.id,ok);
+   b.classList.add(ok?'good':'bad');o.querySelector(`[data-j="${x.q[2]}"]`).classList.add('good');
+   o.nextElementSibling.textContent=(ok?'Bonne réponse. ':'Pas tout à fait. ')+x.q[3];
+   if(n===qs.length){box.querySelector('.score').textContent=`Score : ${score}/${qs.length}`+(onDone?onDone(score,qs.length):'')}})};
+ run()}
+
+// ===== Entraînement en continu sur des scénarios =====
+function drill(box,l){const list=DRILLS[l];let ok=0,tot=0,bag=[];
+ const next=()=>{if(!bag.length)bag=shuffle(list.map((_,k)=>k));const k=bag.pop(),q=list[k],order=shuffle(q[1].map((_,j)=>j));
+  box.innerHTML=`<b>Entraînement</b><div>${q[0]}</div><div class="opts">${order.map(j=>`<button data-j="${j}">${q[1][j]}</button>`).join('')}</div><div class="exp"></div><div class="qbar"><span class="score">${tot?`Score : ${ok}/${tot}`:''}</span><button class="nx">Suivant</button></div>`;
+  box.querySelector('.nx').onclick=next;
+  box.querySelector('.opts').onclick=e=>{const b=e.target.closest('button'),o=e.currentTarget;if(!b||o.dataset.done)return;o.dataset.done=1;
+   const good=+b.dataset.j===q[2];tot++;if(good)ok++;markErr('d'+l+'-'+k,good);
+   b.classList.add(good?'good':'bad');o.querySelector(`[data-j="${q[2]}"]`).classList.add('good');
+   box.querySelector('.exp').textContent=(good?'Correct. ':'Raté. ')+q[3];box.querySelector('.score').textContent=`Score : ${ok}/${tot}`}};
+ next()}
+
+// ===== Entraîneur de ranges : main + situation au hasard =====
+const SUITS=[['♠',0],['♥',1],['♦',1],['♣',0]];
+const card=(r,s)=>`<div class="pc${s[1]?' red':''}">${r==='T'?'10':r}${s[0]}</div>`;
+function rangeTrainer(box,charts,yes,l){let ok=0,tot=0,cur,answered;
+ const next=()=>{const sit=shuffle(Object.keys(charts))[0],i=Math.random()*13|0,j=Math.random()*13|0,hand=i===j?R[i]+R[j]:i<j?R[i]+R[j]+'s':R[j]+R[i]+'o';
+  const s1=SUITS[Math.random()*4|0],s2=hand.endsWith('s')?s1:shuffle(SUITS.filter(x=>x!==s1))[0];
+  cur={sit,hand,inRange:parse(charts[sit]).has(hand)};answered=false;
+  box.innerHTML=`<b>Entraînement</b><div class="chartwrap"><div><div class="mute">Situation : ${sit}${l===1?'':' — tout le monde a passé avant toi'}</div><div class="cards">${card(hand[0],s1)+card(hand[1],s2)}</div></div>${tableSVG(sit)}</div>
+   <div class="row"><button class="main" data-a="1">${yes}</button><button data-a="0">Jeter</button><button data-a="n">Main suivante</button></div><div class="exp"></div><div class="score">${tot?`Score : ${ok}/${tot}`:''}</div>`};
+ box.onclick=e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.a==='n')return next();if(answered)return;answered=true;tot++;
+  const good=(b.dataset.a==='1')===cur.inRange;if(good)ok++;else markHand(cur.sit,cur.hand,cur.inRange);
+  box.querySelector('.exp').textContent=(good?'Correct : ':'Raté : ')+handName(cur.hand)+(cur.inRange?' fait partie':' ne fait pas partie')+' de la range.';
+  box.querySelector('.score').textContent=`Score : ${ok}/${tot}`;setTimeout(next,1500)};
+ next()}
+
+
+// =====================================================================
+// SUIVI DE BANKROLL
+// =====================================================================
+const START=34.51,LEVELS=[0.25,0.5,1,2,3,5,10],UP=100,DOWN=80,WEEK_GOAL=20,SESSION_BI=12;
+const eur=v=>v.toFixed(2).replace('.',',')+' €',pct=v=>Math.round(v)+' %';
+const RES={out:'Hors argent',itm:'Dans l\'argent',ft:'Table finale',win:'Victoire'};
+// Date locale AAAA-MM-JJ (évite le décalage UTC autour de minuit)
+const localDay=(d=new Date())=>new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10);
+let db=null,list=[];
+$('d').value=localDay();
+$('ladder').innerHTML=LEVELS.map((l,i)=>`<tr><td>${eur(l)}</td><td>${i?eur(l*UP):'départ'}</td><td>${i?eur(l*DOWN):'25,00 € (pause)'}</td><td>${eur(l*SESSION_BI)}</td></tr>`).join('');
+
+const net=r=>r.gain-r.buyin;
+const chrono=()=>[...list].sort((a,b)=>(a.date+(a.heure||'')).localeCompare(b.date+(b.heure||''))||a.id.localeCompare(b.id));
+// Rejoue les tournois : bankroll, palier (avec hystérésis) et points de la courbe
+function replay(sorted){let br=START,lv=0;const pts=[START];
+ for(const r of sorted){br+=net(r);pts.push(br);
+  while(lv<LEVELS.length-1&&br>=LEVELS[lv+1]*UP)lv++;
+  while(lv>0&&br<LEVELS[lv]*DOWN)lv--;}
+ return{br,lv,pts}}
+let PERIOD=0;
+// Tournois de la période choisie (0 = tout)
+const inPeriod=()=>{if(!PERIOD)return list;const d=new Date();d.setDate(d.getDate()-PERIOD+1);const from=localDay(d);return list.filter(r=>r.date>=from)};
+function group(key){const m={};inPeriod().forEach(r=>{const k=key(r);(m[k]??={n:0,net:0,bi:0});m[k].n++;m[k].net+=net(r);m[k].bi+=r.buyin});return m}
+const slot=h=>{if(!h)return'Non renseigné';const x=+h.slice(0,2);return x<6?'Nuit (0h-6h)':x<12?'Matin (6h-12h)':x<18?'Après-midi (12h-18h)':'Soirée (18h-24h)'};
+const isWin=r=>r.res?r.res!=='out':r.gain>0;
+
+function render(){
+ const s=chrono(),{br,lv,pts}=replay(s),n=s.length;
+ const limTxt=br<25?'Pause / revue':eur(LEVELS[lv]);
+ $('br').textContent=$('side-br').textContent=eur(br);
+ $('lim').textContent=limTxt;$('side-lim').textContent='Limite '+limTxt;
+ const next=lv<LEVELS.length-1?LEVELS[lv+1]*UP:null,base=lv?LEVELS[lv]*DOWN:START;
+ $('prog').style.width=(next?Math.max(0,Math.min(100,(br-base)/(next-base)*100)):100)+'%';
+ $('progtxt').textContent=next?`Encore ${eur(Math.max(0,next-br))} pour passer à ${eur(LEVELS[lv+1])} · seuil ${eur(next)} · max ${eur(LEVELS[lv]*SESSION_BI)} par session`:'Palier maximum atteint';
+
+ // Indicateurs
+ const bi=s.reduce((a,r)=>a+r.buyin,0),tot=s.reduce((a,r)=>a+net(r),0);
+ $('k-n').firstChild.textContent=n;$('k-roi').firstChild.textContent=bi?pct(tot/bi*100):'—';
+ $('k-itm').firstChild.textContent=n?pct(s.filter(isWin).length/n*100):'—';
+ $('k-ft').firstChild.textContent=s.filter(r=>r.res==='ft'||r.res==='win').length;
+ const mon=new Date();mon.setDate(mon.getDate()-((mon.getDay()+6)%7));const monS=localDay(mon);
+ $('k-week').firstChild.textContent=s.filter(r=>r.date>=monS).length+' / '+WEEK_GOAL;
+
+ // Alertes
+ const al=[],today=localDay(),days={};
+ s.forEach(r=>days[r.date]=(days[r.date]||0)+net(r));
+ const dk=Object.keys(days).sort();let streak=0;for(let i=dk.length-1;i>=0&&days[dk[i]]<0;i--)streak++;
+ if(br<25)al.push(['bad','Bankroll sous 25 € : pause et revue des mains avant de rejouer.']);
+ if(streak>=3)al.push(['bad',`${streak} sessions perdantes d'affilée : fais une pause aujourd'hui.`]);
+ const spent=s.filter(r=>r.date===today).reduce((a,r)=>a+r.buyin,0);
+ if(spent>=LEVELS[lv]*SESSION_BI)al.push(['','Plafond de session atteint aujourd\'hui ('+eur(spent)+' engagés).']);
+ const prev=replay(s.slice(0,-1)).lv;
+ if(n&&lv>prev)al.push(['ok','Palier franchi : tu peux jouer '+eur(LEVELS[lv])+' (en mélange au début).']);
+ if(n&&lv<prev)al.push(['bad','Retour au palier '+eur(LEVELS[lv])+'. Ce n\'est qu\'une étape.']);
+ $('alerts').innerHTML='';al.forEach(([c,t])=>{const d=document.createElement('div');d.className='alert '+c;d.textContent=t;$('alerts').appendChild(d)});
+
+ drawChart(pts);recommend(s,streak);
+ fillGroup('bytype',group(r=>r.type||'Autre'));fillGroup('byhour',group(r=>slot(r.heure)));
+ const sp=inPeriod(),np=sp.length,rc={};sp.forEach(r=>{const k=RES[r.res]||(r.gain>0?RES.itm:RES.out);rc[k]=(rc[k]||0)+1});
+ $('byres').innerHTML=np?Object.entries(rc).map(([k,v])=>`<tr><td>${k}</td><td>${v}</td><td>${pct(v/np*100)}</td></tr>`).join(''):'<tr><td colspan="3" class="mute">Pas encore de données.</td></tr>';
+
+ // Historique
+ const tb=$('rows');tb.innerHTML='';
+ if(!n)tb.innerHTML='<tr><td colspan="8" class="mute">Aucun tournoi pour l\'instant.</td></tr>';
+ [...s].reverse().forEach(r=>{const tr=document.createElement('tr'),v=net(r);
+  [r.date,r.heure||'',r.type,eur(r.buyin),eur(r.gain),(v>=0?'+':'')+eur(v),r.note||''].forEach((x,i)=>{const td=document.createElement('td');td.textContent=x;if(i==5)td.className=v>=0?'p':'n';tr.appendChild(td)});
+  const td=document.createElement('td'),ed=document.createElement('button');ed.className='x';ed.textContent='✎';ed.title='Modifier ce tournoi';ed.setAttribute('aria-label','Modifier');ed.onclick=()=>editSession(r);td.appendChild(ed);
+  const b=document.createElement('button');b.className='x';b.textContent='✕';b.title='Supprimer ce tournoi';b.setAttribute('aria-label','Supprimer');
+  b.onclick=async()=>{if(b.dataset.c){b.disabled=true;try{await db.doc('sessions/'+r.id).delete();toast('Tournoi supprimé')}catch{b.disabled=false;toast('Suppression impossible. Réessaie.')}}else{b.dataset.c=1;b.textContent='Confirmer ?';setTimeout(()=>{delete b.dataset.c;b.textContent='✕'},3000)}};
+  td.appendChild(b);tr.appendChild(td);tb.appendChild(tr)});
+
+ // Journal de mains
+ const hs=[...s].reverse().filter(r=>r.main);
+ $('hands').className=hs.length?'':'mute';$('hands').textContent=hs.length?'':'Aucune main à revoir.';
+ hs.forEach(r=>{const d=document.createElement('div');d.className='hand';d.textContent=`${r.date} · ${r.type} — ${r.main}`;$('hands').appendChild(d)})
+}
+function fillGroup(id,m){const e=Object.entries(m);
+ $(id).innerHTML=e.length?e.map(([k,v])=>`<tr><td>${k}</td><td>${v.n}</td><td class="${v.net>=0?'p':'n'}">${(v.net>=0?'+':'')+eur(v.net)}</td><td>${v.bi?pct(v.net/v.bi*100):'—'}</td></tr>`).join(''):'<tr><td colspan="4" class="mute">Pas encore de données.</td></tr>'}
+
+// Courbe SVG avec seuils de palier
+function drawChart(pts){
+ const W=760,H=220,L0=56,R0=12,T=12,B=28;
+ const lo=Math.min(...pts,25)*0.95,hi=Math.max(...pts,50)*1.05;
+ const x=i=>L0+(pts.length>1?i/(pts.length-1):0)*(W-L0-R0),y=v=>T+(1-(v-lo)/(hi-lo))*(H-T-B);
+ let g='<defs><linearGradient id="gf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--felt)" stop-opacity=".28"/><stop offset="1" stop-color="var(--felt)" stop-opacity="0"/></linearGradient></defs>';
+ for(let k=0;k<=4;k++){const v=lo+(hi-lo)*k/4;g+=`<line x1="${L0}" x2="${W-R0}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="${L0-6}" y="${y(v)+4}" text-anchor="end">${v.toFixed(0)}€</text>`}
+ LEVELS.slice(1).forEach(l=>{const v=l*UP;if(v>lo&&v<hi)g+=`<line x1="${L0}" x2="${W-R0}" y1="${y(v)}" y2="${y(v)}" stroke="var(--gold)" stroke-dasharray="4 4"/><text x="${W-R0}" y="${y(v)-4}" text-anchor="end">palier ${eur(l)}</text>`});
+ const d=pts.map((v,i)=>(i?'L':'M')+x(i).toFixed(1)+' '+y(v).toFixed(1)).join(' ');
+ g+=`<path d="${d} L${x(pts.length-1)} ${H-B} L${L0} ${H-B}Z" fill="url(#gf)"/><path d="${d}" fill="none" stroke="var(--felt)" stroke-width="2.5" stroke-linejoin="round"/>`;
+ g+=`<circle cx="${x(pts.length-1)}" cy="${y(pts[pts.length-1])}" r="5" fill="var(--felt)" stroke="var(--card)" stroke-width="2"/><text x="${L0}" y="${H-8}">départ</text><text x="${W-R0}" y="${H-8}" text-anchor="end">tournoi ${pts.length-1}</text>`;
+ $('chart').innerHTML=g}
+
+// Conseils de cours selon les stats (ouvre le cours dans l'École)
+function recommend(s,streak){const box=$('reco'),n=s.length,out=[];
+ // Entraînement : ton thème le plus faible, renforcé si tes résultats en tournoi pointent au même endroit
+ const wk=weakCats(),itm0=n?s.filter(isWin).length/n:1,bub=(prog().cats.bulle||{}),sh=(prog().cats.short||{});
+ if(n>=10&&itm0<.12&&(bub.tot>=5&&bub.ok/bub.tot<.7||sh.tot>=5&&sh.ok/sh.tot<.7))out.push(['train','bulle','ITM bas en tournoi et erreurs à l\'entraînement sur la bulle / tapis court : c\'est ta priorité.']);
+ else if(wk.length&&wk[0].acc<.8)out.push(['train',wk[0].k,'Ton thème le plus faible à la table : '+Math.round(wk[0].acc*100)+' % de réussite.']);
+ if(n<10){render_reco(box,out);return}
+ const itmN=s.filter(isWin).length,itm=itmN/n,ft=s.filter(r=>r.res==='ft'||r.res==='win').length;
+ if(itm<0.12){out.push([5,'Bulle et ICM','Tu rentres rarement dans l\'argent (ITM '+Math.round(itm*100)+' %).']);out.push([4,'Push/fold','Le jeu en tapis court décide souvent de l\'entrée dans l\'argent.'])}
+ if(itmN>=5&&ft/itmN<0.15)out.push([6,'Table finale','Tu rentres dans l\'argent mais atteins peu la table finale.']);
+ if(streak>=2)out.push([7,'Mental et tilt','Plusieurs sessions perdantes d\'affilée.']);
+ if(s.filter(r=>r.main).length>=3)out.push([2,'Postflop de base','Tu as plusieurs mains notées : relis les bases postflop.']);
+ if(!out.length)out.push([L.length,'Quiz final','Stats correctes : valide le quiz final avant de monter de palier.']);
+ render_reco(box,out)}
+function render_reco(box,out){if(!out.length)return;box.className='';box.innerHTML='';box.style.display='grid';box.style.gap='8px';
+ out.slice(0,3).forEach(([c,t,why])=>{const d=document.createElement('div');d.className='alert ok';const b=document.createElement('button');b.className='linkbtn';
+  if(c==='train'){b.textContent='Entraînement : '+(CATS[t]||t);b.onclick=()=>{go('entrainement');$('t-modes').querySelector('[data-m="weak"]').click()}}
+  else{b.textContent=(c<L.length?'Cours '+(c+1)+' : ':'')+t;b.onclick=()=>go('ecole',c)}
+  d.appendChild(b);d.appendChild(document.createTextNode(' — '+why));box.appendChild(d)})}
+
+// Choix du résultat (boutons segmentés)
+let resVal='out';
+function choisirResultat(r){resVal=r;for(const b of $('res').children)b.setAttribute('aria-pressed',b.dataset.r===r)}
+$('res').onclick=e=>{const b=e.target.closest('button');if(b)choisirResultat(b.dataset.r)};
+
+// Modification : remplit le formulaire avec le tournoi choisi
+let editId=null;
+function editSession(r){editId=r.id;$('d').value=r.date;$('h').value=r.heure||'';$('t').value=r.type;$('b').value=r.buyin;$('g').value=r.gain;$('n').value=r.note||'';$('m').value=r.main||'';
+ choisirResultat(r.res||(r.gain>0?'itm':'out'));
+ $('f-title').textContent='Modifier le tournoi du '+r.date;$('f-save').textContent='Mettre à jour';$('f-cancel').hidden=false;$('f').scrollIntoView({block:'center'})}
+function endEdit(){editId=null;choisirResultat('out');$('f-title').textContent='Ajouter un tournoi';$('f-save').textContent='Enregistrer le tournoi';$('f-cancel').hidden=true;['n','m'].forEach(k=>$(k).value='');$('g').value=0}
+$('f-cancel').onclick=endEdit;
+// Ajout ou mise à jour d'un tournoi
+$('f').onsubmit=async e=>{e.preventDefault();if(!db)return toast('Stockage indisponible dans cette vue');const v=id=>$(id).value,id=editId||Date.now().toString(36),was=editId;
+ if($('f-save').disabled)return;$('f-save').disabled=true;
+ try{await db.doc('sessions/'+id).set({date:v('d'),heure:v('h'),type:v('t'),buyin:+v('b'),gain:+v('g'),res:resVal,note:v('n'),main:v('m')});
+  endEdit();toast(was?'Tournoi mis à jour':'Tournoi enregistré')}
+  catch(err){toast('Échec de l\'enregistrement : '+(err.message||err.code))}finally{$('f-save').disabled=false}};
+
+// Export CSV de sauvegarde (séparateur ; pour Excel en français)
+useCap('downloads').then(dl=>{if(!dl)return;$('csv').hidden=false;$('csv').onclick=async()=>{
+ const esc=v=>'"'+String(v??'').replace(/"/g,'""')+'"',rows=[['Date','Heure','Tournoi','Buy-in','Gain','Net','Résultat','Place','Main à revoir']];
+ chrono().forEach(r=>rows.push([r.date,r.heure,r.type,String(r.buyin).replace('.',','),String(r.gain).replace('.',','),net(r).toFixed(2).replace('.',','),RES[r.res]||'',r.note,r.main]));
+ try{const res=await dl.save({filename:'grind-poker-tournois-'+localDay()+'.csv',data:'\ufeff'+rows.map(r=>r.map(esc).join(';')).join('\r\n')});if(res.status==='saved')toast('Export enregistré')}
+ catch(err){if(err.code!=='cancelled'&&err.code!=='declined')toast('Export impossible : '+(err.message||err.code))}}});
+// Sauvegardes du logiciel Windows : liste, copie à la demande, restauration
+function initSauvegardes(){setTimeout(()=>{if(MODE_STOCKAGE!=='api')return;$('sauv-card').hidden=false;listerSauvegardes();
+ $('sauv-now').onclick=()=>fetch('api/sauvegarder',{method:'POST'}).then(r=>r.ok?toast('Sauvegarde créée'):toast('Rien à sauvegarder pour l\'instant')).then(listerSauvegardes)},800)}
+function listerSauvegardes(){fetch('api/sauvegardes',{cache:'no-store'}).then(r=>r.json()).then(l=>{const tb=$('sauv-list');tb.innerHTML=l.length?'':'<tr><td colspan="3" class="mute">Aucune copie pour l\'instant.</td></tr>';
+ l.forEach(x=>{const tr=document.createElement('tr');tr.innerHTML=`<td>${x.date}</td><td>${Math.max(1,Math.round(x.taille/1024))} Ko</td><td></td>`;const b=document.createElement('button');b.className='x';b.textContent='Restaurer';
+  b.onclick=()=>{if(b.dataset.c){fetch('api/restaurer',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nom:x.nom})}).then(r=>{if(r.ok)location.reload();else toast('Restauration impossible')})}else{b.dataset.c=1;b.textContent='Confirmer ?';setTimeout(()=>{delete b.dataset.c;b.textContent='Restaurer'},3000)}};
+  tr.lastChild.appendChild(b);tb.appendChild(tr)})}).catch(()=>{})}
+function toast(t){const e=$('toast');e.textContent=t;e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>e.hidden=true,2400)}
+
+// =====================================================================
+// ÉCOLE : progression, pages de cours, quiz final, révision
+// =====================================================================
+let done=new Set(store.get('coursFaits',[]));
+const nav=$('nav'),main=$('lesson'),EXTRA=['Quiz final','Révision'];
+// Sauvegarde de la progression dans le stockage de l'application (synchronisée entre appareils)
+function syncProgress(){if(!db)return;clearTimeout(syncProgress.t);syncProgress.t=setTimeout(()=>{
+  db.doc('progress/ecole').set({coursFaits:[...done],erreursQ:[...errs],erreursMains:errHands,entrainement:tstats}).catch(()=>toast('Progression non enregistrée. Vérifie le stockage.'))},600)}
+function updateBadges(){
+ [...nav.children].forEach((b,k)=>b.textContent=k<L.length?(done.has(k)?'✓ ':'')+L[k].t:k===L.length?EXTRA[0]:EXTRA[1]+` (${errs.size+errHands.length})`);
+ $('progtxt2').textContent=`${done.size}/${L.length} cours terminés`;$('progbar').style.width=done.size/L.length*100+'%'}
+
+const TOOLS={0:['c1',OPEN,'Ouvrir'],1:['c2',THREEBET,'Jouer'],4:['c5',PUSH,'Tapis']};
+let curLesson=0;
+function select(i){curLesson=i;[...nav.children].forEach((b,k)=>b.setAttribute('aria-selected',k===i));nav.children[i].scrollIntoView({block:'nearest',inline:'center'});store.set('cours',i)}
+function pager(i){const c=nav.children;return `<div class="pager"><button id="prev" ${i?'':'disabled'}>← ${i?c[i-1].textContent:''}</button><button class="main" id="next" ${i<c.length-1?'':'disabled'}>${i<c.length-1?c[i+1].textContent:''} →</button></div>`}
+function bindPager(i){$('prev').onclick=()=>{show(i-1);scrollTo(0,0)};$('next').onclick=()=>{show(i+1);scrollTo(0,0)}}
+
+function show(i){select(i);
+ if(i===L.length)return showFinal(i);if(i===L.length+1)return showReview(i);
+ const c=L[i],tool=TOOLS[i];
+ main.innerHTML=c.h+(tool||DRILLS[i]?'<div class="train" id="tr"></div>':'')+'<div id="qz"></div>'
+  +`<div class="memo"><h3>Fiche mémo</h3><ul>${MEMO[i].map(m=>`<li>${m}</li>`).join('')}</ul></div>`+pager(i);
+ if(tool){bindChart(tool[0],tool[1]);rangeTrainer($('tr'),tool[1],tool[2],i)}else if(DRILLS[i])drill($('tr'),i);
+ quiz($('qz'),c.q.map((_,k)=>i+'-'+k),'Quiz',s=>{if(s>=2){done.add(i);store.set('coursFaits',[...done]);updateBadges();return ' — cours validé ✓'}return ' — relis le cours et réessaie'});
+ bindPager(i)}
+function showFinal(i){const all=L.flatMap((c,l)=>c.q.map((_,k)=>l+'-'+k));
+ main.innerHTML=`<h2>Quiz final</h2><p class="mute">20 questions au hasard sur les ${L.length} cours. Visé : 16/20 avant de monter de palier.</p><div id="qz"></div>`+pager(i);
+ quiz($('qz'),shuffle(all).slice(0,20),'Questions',s=>s>=16?' — prêt pour le palier suivant':' — revois tes erreurs dans l\'onglet Révision');bindPager(i)}
+function showReview(i){const ids=[...errs];
+ main.innerHTML=`<h2>Révision</h2><p class="mute">Les questions ratées disparaissent quand tu les réussis.</p><div id="qz"></div>
+  <h3>Mains ratées à l'entraînement</h3>${errHands.length?`<div class="tw"><table><thead><tr><th>Main</th><th>Situation</th><th>Bonne action</th></tr></thead><tbody>${errHands.map(h=>`<tr><td>${handName(h.hand)}</td><td>${h.sit}</td><td>${h.inRange?'Jouer':'Jeter'}</td></tr>`).join('')}</tbody></table></div><div class="qbar"><button id="clr">Vider la liste</button></div>`:'<p class="mute">Aucune main ratée.</p>'}`+pager(i);
+ if(ids.length)quiz($('qz'),ids,`${ids.length} question(s) à revoir`,()=>'');else $('qz').innerHTML='<p class="mute">Aucune question à revoir.</p>';
+ const c=$('clr');if(c)c.onclick=()=>{errHands=[];store.set('erreursMains',[]);updateBadges();showReview(i)};bindPager(i)}
+for(let k=0;k<L.length+2;k++){const b=document.createElement('button');b.setAttribute('role','tab');if(k>=L.length)b.className='extra';b.onclick=()=>show(k);nav.appendChild(b)}
+updateBadges();
+
+
+// =====================================================================
+// GUIDE « QUE FAIRE ? » : une réponse pour chaque situation courante
+// =====================================================================
+const GPOS=['UTG','HJ','CO','BTN','SB','BB'];
+const GSTACK={deep:'40 BB et plus',mid:'20 à 40 BB',short:'12 à 20 BB',push:'moins de 12 BB'};
+const GSIT={none:'Personne n\'a joué',limp:'Un ou plusieurs limps devant',open:'Une relance devant',threebet:'On 3-bet ma relance',shove:'Un tapis devant'};
+// Ranges « tapis à 15 BB » manquantes (HJ, CO) et « 10 BB » HJ, estimées entre les positions voisines
+const PUSH15={UTG:PUSH['15 BB – UTG'],HJ:'44+, A8s+, ATo+, KJs+, KQo',CO:'22+, A7s+, ATo+, KTs+, KQo, QJs',BTN:PUSH['15 BB – BTN'],SB:PUSH['15 BB – SB (vs BB)']};
+const PUSH10={UTG:PUSH['10 BB – UTG'],HJ:'22+, A2s+, A5o+, K8s+, KTo+, Q9s+, QJo, JTs',CO:PUSH['10 BB – CO'],BTN:PUSH['10 BB – BTN'],SB:PUSH['10 BB – SB (vs BB)']};
+// Renvoie la liste des actions (la première qui contient la main s'applique) + le conseil
+function prefPlan(st,pos,sit,opt={}){
+ const deepish=st==='deep'||st==='mid';
+ if(sit==='none'){
+  if(pos==='BB')return{acts:[],def:'Check',tip:'Tout le monde a passé ou limpé jusqu\'à toi : tu vois le flop gratuitement.'};
+  if(deepish)return{acts:[['Relancer (2-2,2 BB)',OPEN[Object.keys(OPEN).find(k=>k.startsWith(pos))]]],def:'Jeter',tip:'Premier à parler : relance ou jette, jamais de limp.'};
+  if(st==='short')return{acts:[['Tapis',PUSH15[pos]]],def:'Jeter',tip:'Entre 12 et 20 BB : tapis direct avec ces mains. Relancer puis te coucher te coûterait trop cher.'};
+  return{acts:[['Tapis',PUSH10[pos]]],def:'Jeter',tip:'Sous 12 BB : tapis ou jeter, rien d\'autre.'}}
+ if(sit==='limp'){
+  if(pos==='BB')return{acts:[['Relancer (4 BB + 1/limper)','88+, ATs+, KQs, AQo+']],def:'Check',tip:'En BB face aux limps : relance tes grosses mains, check tout le reste (flop gratuit).'};
+  if(!deepish)return{acts:[['Tapis','22+, A2s+, A8o+, KTs+, KQo, QJs']],def:'Jeter',tip:'Court face à des limpers : tapis avec une bonne main, ils se couchent souvent.'};
+  const wide=pos==='BTN'||pos==='CO';
+  return{acts:[['Relancer (3 BB + 1/limper)',wide?'22+, A2s+, KTs+, QTs+, JTs, T9s, 98s, ATo+, KJo+':'55+, A9s+, KTs+, QTs+, JTs, AJo+, KQo']],def:'Jeter',tip:'Isole le limper avec une main plus forte que la sienne ; tu joueras contre un joueur faible. Au BTN, tu peux aussi limper derrière avec les petites paires et assorties.'}}
+ if(sit==='open'){
+  // La réponse dépend de la position du relanceur : early (UTG/HJ) = range forte, late (CO/BTN/SB) = range large
+  const op=opt.opener||'CO',early=op==='UTG'||op==='HJ',from=' (relance de '+op+')';
+  if(st==='push')return{acts:[['Tapis',early?'66+, A9s+, ATo+, KQs':'55+, A7s+, A9o+, KTs+, KQo']],def:'Jeter',tip:'Trop court pour payer : tapis ou jeter'+from+'.'};
+  if(st==='short')return{acts:[['Tapis (re-shove)',early?'99+, AJs+, AQo+':'66+, A9s+, ATo+, KJs+, KQo']],def:'Jeter',tip:'Entre 12 et 20 BB, sur une relance : re-tapis'+from+'. Plus serré contre UTG/HJ.'};
+  if(pos==='BB'){
+   if(early)return{acts:[['3-bet (×3,5)','QQ+, AKs, AKo'],['Payer','22+, A2s+, K9s+, Q9s+, J9s+, T8s+, 98s, 87s, 76s, 65s, ATo+, KJo+, QJo']],def:'Jeter',tip:'Défense BB contre '+op+' : range serrée, les mains dépareillées faibles sont dominées.'};
+   if(op==='CO')return{acts:[['3-bet (×3,5)','JJ+, AQs+, AKo, A5s'],['Payer','22+, A2s+, K5s+, Q7s+, J7s+, T7s+, 97s+, 86s+, 75s+, 65s, 54s, A7o+, K9o+, Q9o+, J9o+, T9o']],def:'Jeter',tip:'Défense BB contre le CO : assez large, tu as déjà 1 BB dans le pot.'};
+   return{acts:[['3-bet (×3,5)','TT+, AQs+, AKo, A5s, A4s'],['Payer',THREEBET['Payer en BB vs BTN (2,2 BB)']]],def:'Jeter',tip:'Défense BB contre '+op+' : très large, sa range d\'ouverture est large.'}}
+  if(pos==='SB')return{acts:[['3-bet (×4)',early?'QQ+, AKs, AKo':'99+, AJs+, KQs, AQo+, A5s']],def:'Jeter',tip:'En SB : 3-bet ou fold'+from+', évite de payer hors position.'};
+  if(early)return{acts:[['3-bet (×3)','QQ+, AKs, AKo'],['Payer (en position)','22+, AQs, AJs, KQs, AQo']],def:'Jeter',tip:'Contre '+op+', la range est forte : 3-bet seulement les très grosses mains, paie les paires pour toucher un set.'};
+  return{acts:[['3-bet (×3)','TT+, AQs+, AKo, A5s, A4s'],['Payer (en position)','22+, ATs+, KJs+, QJs, JTs, T9s, 98s, AQo, AJo, KQo']],def:'Jeter',tip:'Contre '+op+', range large : 3-bet un peu plus large et paie en position.'}}
+ if(sit==='threebet'){
+  if(!deepish)return{acts:[['Tapis','TT+, AQs+, AKo']],def:'Jeter',tip:'Court : tapis ou jeter.'};
+  return{acts:[['4-bet / tapis','QQ+, AKs, AKo'],['Payer','88+, AQs, AJs, KQs, JTs']],def:'Jeter',tip:'À 0,25 €, un 3-bet est presque toujours une main forte : jette le reste sans regret.'}}
+ // Payer un tapis : dépend de la taille du tapis adverse
+ const sv=opt.shoveBB||15,small=sv<=10;
+ return{acts:[['Payer le tapis',small?'55+, A7s+, A9o+, KTs+, KQo':'88+, ATs+, AJo+, KQs']],def:'Jeter',tip:`Contre un tapis de ${sv} BB : ${small?'élargis, il pousse très large et le prix est bon':'range serrée, il reste des mains fortes dans sa range'}. À la bulle, resserre.`}}
+function gridPlan(plan){const sets=plan.acts.map(a=>parse(a[1])),CL=['a1','a2'];let out='',n=[0,0];
+ for(let i=0;i<13;i++)for(let j=0;j<13;j++){const h=i===j?R[i]+R[j]:i<j?R[i]+R[j]+'s':R[j]+R[i]+'o';const k=sets.findIndex(s=>s.has(h));
+  if(k>=0)n[k]+=i===j?6:i<j?4:12;out+=`<div class="${k>=0?'in '+CL[k]:''}" title="${h}">${h.replace(/[so]$/,'')}</div>`}
+ return{html:out,pct:n.map(x=>(x/1326*100).toFixed(0))}}
+function actionFor(plan,h){for(const a of plan.acts)if(parse(a[1]).has(h))return a[0];return plan.def}
+
+// Postflop : catégorie de main × situation → action
+const PHAND={monster:'Très forte : set, deux paires, quinte, couleur',top:'Top paire bon kicker / overpaire',mid:'Paire moyenne ou top paire kicker faible',draw:'Tirage fort (8 outs et plus)',weak:'Petit tirage (ventrale, 2 overcards)',air:'Rien'};
+const PSIT={init:'J\'ai relancé avant le flop, c\'est à moi',check:'On a checké vers moi (je n\'ai pas relancé)',bet:'On mise sur moi',raise:'On relance ma mise'};
+const POST={
+ monster:{init:'MISER 2/3 du pot. Continue à chaque street, grosse mise à la river.',check:'MISER 2/3 du pot pour construire le pot.',bet:'RELANCER (×3). Sur un board très coordonné, relance toujours pour protéger.',raise:'TAPIS ou relancer. Seule exception : ta main a été rattrapée par un board à 4 cartes de couleur/quinte.'},
+ top:{init:'MISER 1/2 à 2/3. Value sur 2 streets, prudence si grosse action au turn/river.',check:'MISER 1/2 à 2/3.',bet:'PAYER. Relance seulement contre un joueur agressif.',raise:'PAYER une fois contre un agressif ; JETER contre un joueur passif (il a mieux).'},
+ mid:{init:'MISER petit (1/3) sur board sec, sinon CHECK pour contrôler le pot.',check:'CHECK le plus souvent (tu vas à l\'abattage gratuitement).',bet:'PAYER une petite mise au flop ; JETER face à de grosses mises au turn/river.',raise:'JETER.'},
+ draw:{init:'MISER (semi-bluff) 1/2 à 2/3 face à 1 adversaire.',check:'MISER ou CHECK ; mise si tu peux faire coucher.',bet:'PAYER si la cote est bonne (voir entraînement « Cotes »), relancer avec 12+ outs.',raise:'PAYER seulement avec la cote ; tapis avec 12+ outs si les tapis sont courts.'},
+ weak:{init:'MISER 1/3 sur board sec contre 1 adversaire, sinon CHECK.',check:'CHECK.',bet:'JETER, sauf mise minuscule (≤ 1/4 pot).',raise:'JETER.'},
+ air:{init:'MISER 1/3 seulement sur board sec (A/K high) contre 1 adversaire ; sinon CHECK/abandon.',check:'CHECK.',bet:'JETER.',raise:'JETER.'}};
+const MULTI=' En multiway (3 joueurs ou plus) : pas de bluff, pas de semi-bluff avec un petit tirage, et une paire moyenne se joue en check.';
+
+// =====================================================================
+// ENTRAÎNEMENT : exercices illimités + mises en situation
+// =====================================================================
+let tstats=store.get('entrainement',{});
+function tstat(mode,ok,ms){const x=tstats[mode]??={ok:0,tot:0,day:'',today:0};x.tot++;if(ok)x.ok++;
+ if(ms!=null){x.ms=(x.ms||0)+ms;x.timed=(x.timed||0)+1;if(ok&&ms<=10000)x.fast=(x.fast||0)+1}
+ const t=localDay();if(x.day!==t){x.day=t;x.today=0}x.today++;store.set('entrainement',tstats);renderTrainStats()}
+const rnd=a=>a[Math.random()*a.length|0];
+// Chrono de décision : barre qui se vide ; à zéro, la réponse compte comme ratée
+let CHRONO=+store.get('chrono',10);
+function decisionClock(box,seconds,paint,onTimeout){
+ box.clock?.stop();
+ let elapsed=0,started=null,timer=null;
+ const duration=()=>elapsed+(started===null?0:performance.now()-started);
+ function pause(){elapsed=duration();started=null;clearInterval(timer);timer=null}
+ function tick(){const left=Math.max(0,seconds*1000-duration());paint(left);if(left===0)onTimeout()}
+ function refresh(){
+  if(document.hidden||box.closest('[hidden]')){pause();return}
+  if(started!==null)return;
+  started=performance.now();
+  if(seconds){timer=setInterval(tick,100);tick()}
+ }
+ function stop(){pause();box.clock=null;return elapsed}
+ box.clock={refresh,stop};refresh();return stop;
+}
+function refreshClocks(){for(const id of ['t-box','e-box'])$(id).clock?.refresh()}
+document.addEventListener('visibilitychange',refreshClocks);
+function startTimer(box,onTimeout){
+ const bar=box.querySelector('.tbar i'),lab=box.querySelector('.tlab'),seconds=CHRONO;
+ if(!seconds)box.querySelector('.tbar').hidden=true;
+ return decisionClock(box,seconds,left=>{
+  bar.style.width=left/(seconds*10)+'%';bar.className=left<seconds*300?'hot':'';
+  lab.textContent=(left/1000).toFixed(1)+' s';
+ },onTimeout);
+}
+const TBAR='<div class="trow"><div class="tbar"><i style="width:100%"></i></div><span class="tlab"></span></div>';
+// Main tirée selon sa vraie fréquence : paire 6 combos, assortie 4, dépareillée 12
+function comboHand(){let r=Math.random()*1326;for(let i=0;i<13;i++)for(let j=0;j<13;j++){const w=i===j?6:i<j?4:12;r-=w;if(r<0)return i===j?R[i]+R[j]:i<j?R[i]+R[j]+'s':R[j]+R[i]+'o'}return 'AA'}
+// Mains à la frontière de la range (voisine de grille avec une autre action) : les vraies décisions
+function pickHand(plan){if(Math.random()<.45)return comboHand();const cell=(i,j)=>i===j?R[i]+R[j]:i<j?R[i]+R[j]+'s':R[j]+R[i]+'o',B=[];
+ for(let i=0;i<13;i++)for(let j=0;j<13;j++){const a=actionFor(plan,cell(i,j));if([[1,0],[-1,0],[0,1],[0,-1]].some(([di,dj])=>{const x=i+di,y=j+dj;return x>=0&&y>=0&&x<13&&y<13&&actionFor(plan,cell(x,y))!==a}))B.push(cell(i,j))}
+ return B.length?rnd(B):comboHand()}
+function randHand(){const i=Math.random()*13|0,j=Math.random()*13|0;return i===j?R[i]+R[j]:i<j?R[i]+R[j]+'s':R[j]+R[i]+'o'}
+function handCards(h){const s1=rnd(SUITS),s2=h.endsWith('s')?s1:rnd(SUITS.filter(x=>x!==s1));return card(h[0],s1)+card(h[1],s2)}
+const cardsOf=str=>str.split(' ').map(c=>{const s=SUITS.find(x=>x[0]===c.slice(-1));return card(c.slice(0,-1),s)}).join('');
+
+// Générateurs de questions : {mode, ctx (HTML), opts, ans, exp}
+const GEN={
+ // Préflop complet, tiré du guide : toutes positions, tapis et situations
+ preflop(){let pos,sit;const st=rnd(Object.keys(GSTACK));
+  for(;;){pos=rnd(GPOS);sit=rnd(Object.keys(GSIT));const i=GPOS.indexOf(pos);if(sit==='none'&&pos==='BB')continue;if(i===0&&sit!=='none'&&sit!=='threebet')continue;if(sit==='threebet'&&pos==='BB')continue;break}
+  const opt={};if(sit==='open')opt.opener=rnd(GPOS.slice(0,GPOS.indexOf(pos)));if(sit==='shove')opt.shoveBB=6+Math.floor(Math.random()*13);
+  const p=prefPlan(st,pos,sit,opt),h=pickHand(p);
+  const good=actionFor(p,h),opts=[...new Set([...p.acts.map(a=>a[0]),p.def])];
+  return{ctx:`<div class="mute">Tapis : <b>${GSTACK[st]}</b> · Position : <b>${pos}</b> · ${GSIT[sit]}${opt.opener?' de <b>'+opt.opener+'</b>':''}${opt.shoveBB?' de <b>'+opt.shoveBB+' BB</b>':''}</div><div class="cards">${handCards(h)}</div>${tableSVG(pos)}`,opts,ans:opts.indexOf(good),exp:`${handName(h)} → ${good}. ${p.tip}`}},
+ // Cotes du pot avec tirage
+ odds(){const D=[['un tirage couleur',9],['un tirage quinte bilatérale',8],['un tirage quinte ventrale',4],['2 overcards',6],['un tirage couleur + quinte',15],['un tirage couleur + une overcard',12]],[nm,o]=rnd(D),street=rnd(['flop','turn']);
+  const pot=rnd([4,6,8,10,12,15,20]),bet=Math.round(pot*rnd([0.25,0.33,0.5,0.66,0.75,1])*2)/2,need=bet/(pot+2*bet)*100;
+  const eq=street==='turn'?o/46*100:(1-(1-o/47)*(1-o/46))*100,eq1=o/47*100;
+  // Au flop face à une mise, on raisonne sur la carte suivante (l'adversaire misera encore au turn)
+  const e=street==='turn'?eq:eq1,good=e>=need?0:1;
+  return{ctx:`<div class="mute">${street==='turn'?'Turn':'Flop'} · pot ${pot} € · mise adverse ${bet} € · tu as <b>${nm}</b> (${o} outs)</div>`,opts:['Payer','Jeter'],ans:good,
+   exp:`Il te faut ${need.toFixed(0)} % d'équité (${bet} / ${pot+2*bet}). Tu as ≈ ${e.toFixed(0)} % sur la prochaine carte. ${good?'Jette, sauf si l\'adversaire paiera très gros quand tu touches.':'Paie : la cote est bonne.'}`}},
+ // Postflop : situation → action du guide
+ postflop(){const h=rnd(Object.keys(PHAND)),s=rnd(Object.keys(PSIT)),multi=Math.random()<0.25,good=POST[h][s].split(/[ .,;]/)[0];
+  const pool=['MISER','CHECK','PAYER','RELANCER','JETER','TAPIS'],opts=shuffle([good,...shuffle(pool.filter(x=>x!==good)).slice(0,2)]);
+  const g=multi&&(h==='air'||h==='weak')&&s!=='bet'&&s!=='raise'?'CHECK':good,o2=opts.includes(g)?opts:[g,...opts.slice(1)];
+  return{ctx:`<div class="mute">${multi?'3 joueurs ou plus':'1 adversaire'} · ${PSIT[s]}</div><div><b>Ta main :</b> ${PHAND[h]}</div>`,opts:o2,ans:o2.indexOf(g),exp:POST[h][s]+(multi?MULTI:'')}},
+ // Questions des cours et des entraînements de cours
+ cours(){const pool=[...L.flatMap((c,l)=>c.q.map((_,k)=>l+'-'+k)),...Object.entries(DRILLS).flatMap(([l,a])=>a.map((_,k)=>'d'+l+'-'+k))],id=rnd(pool),q=getQ(id);
+  return{ctx:`<div>${q[0]}</div>`,opts:q[1],ans:q[2],exp:q[3]}}
+};
+const MODES={preflop:'Exercices préflop',postflop:'Exercices après le flop',odds:'Cotes et tirages',cours:'Questions de cours',mix:'Exercices mixtes'};
+
+function runner(box,mode){let ok=0,tot=0;
+ const next=()=>{const m=mode==='mix'?rnd(Object.keys(GEN)):mode,q=GEN[m](),order=shuffle(q.opts.map((_,j)=>j));
+  box.innerHTML=`<b>${MODES[mode]}</b>${TBAR}${q.ctx}<div class="opts">${order.map(j=>`<button data-j="${j}">${q.opts[j]}</button>`).join('')}</div><div class="exp"></div><div class="qbar"><span class="score">${tot?`Score : ${ok}/${tot} (${Math.round(ok/tot*100)} %)`:''}</span><button class="nx">Suivant →</button></div>`;
+  box.querySelector('.nx').onclick=next;const o=box.querySelector('.opts');
+  const answer=(b,late)=>{if(o.dataset.done)return;o.dataset.done=1;const ms=stop(),good=!late&&+b.dataset.j===q.ans;tot++;if(good)ok++;tstat(m,good,CHRONO?ms:null);
+   if(b)b.classList.add(good?'good':'bad');o.querySelector(`[data-j="${q.ans}"]`).classList.add('good');
+   box.querySelector('.exp').textContent=(late?'Temps écoulé ! ':good?`Correct en ${(ms/1000).toFixed(1)} s. `:'Raté. ')+q.exp;box.querySelector('.score').textContent=`Score : ${ok}/${tot} (${Math.round(ok/tot*100)} %)`};
+  o.onclick=e=>{const b=e.target.closest('button');if(b)answer(b,false)};const stop=startTimer(box,()=>answer(null,true))};
+ next()}
+
+// Mises en situation : un coup complet, décision après décision
+const SCEN=[
+ {t:'Début de Monster Stack, AK au CO',ctx:'150 BB, tout le monde passe jusqu\'à toi.',h:'A♠ K♦',steps:[
+  ['Préflop : que fais-tu ?','',['Relancer 2,2 BB','Limper','Tapis'],0,'AK s\'ouvre toujours en relance normale ; le tapis ne fait payer que les mains qui te battent.'],
+  ['Le BTN paie. Flop K♥ 7♣ 2♦. Que fais-tu ?','K♥ 7♣ 2♦',['Miser 1/3','Check','Miser pot'],0,'Top paire top kicker sur board sec : petit c-bet pour garder ses mains faibles.'],
+  ['Il paie. Turn 4♠. ?','K♥ 7♣ 2♦ 4♠',['Miser 2/3','Check'],0,'Tu es devant quasiment tout : value.'],
+  ['Il relance tapis au turn (joueur passif jusque-là). ?','K♥ 7♣ 2♦ 4♠',['Payer','Jeter'],1,'Passif qui relance tapis profond = set ou deux paires. Une top paire ne vaut pas 150 BB ici. Dur, mais correct à ce niveau.']]},
+ {t:'Petite paire en profondeur',ctx:'120 BB, UTG ouvre à 2 BB, tu es au BTN.',h:'5♥ 5♣',steps:[
+  ['Préflop ?','',['Payer','3-bet','Jeter'],0,'Set mining en position avec des tapis profonds.'],
+  ['Flop A♦ 9♠ 3♣, UTG mise 1/2 pot. ?','A♦ 9♠ 3♣',['Jeter','Payer','Relancer'],0,'Pas de set, board dangereux : on lâche.']]},
+ {t:'Bouton contre les blindes, 25 BB',ctx:'25 BB, tout le monde passe jusqu\'à toi au BTN.',h:'Q♣ 9♣',steps:[
+  ['Préflop ?','',['Relancer 2 BB','Tapis','Jeter'],0,'Q9s est dans la range d\'ouverture BTN ; à 25 BB on relance petit.'],
+  ['La BB (40 BB) relance à 6 BB. ?','',['Jeter','Tapis','Payer'],0,'Ta main est faible face à un 3-bet ; jette sans regret.']]},
+ {t:'Tapis court à la bulle',ctx:'Bulle. Tu as 9 BB en CO, 2 joueurs ont moins de 4 BB.',h:'A♦ 6♠',steps:[
+  ['Tout le monde passe jusqu\'à toi. ?','',['Tapis','Jeter'],0,'A6o est un push CO à 9 BB. Les très petits tapis ne changent pas ta décision de pousser.'],
+  ['Variante : le chip leader pousse avant toi. ?','',['Jeter','Payer'],0,'À la bulle, et avec plus court que toi à la table : fold.']]},
+ {t:'Limpers au CO',ctx:'60 BB. UTG et HJ limpent. Tu es au CO.',h:'A♥ J♠',steps:[
+  ['Préflop ?','',['Relancer 5 BB','Limper','Jeter'],0,'Isolation : 3 BB + 1 par limper.'],
+  ['UTG paie, HJ se couche. Flop J♦ 8♣ 3♥, UTG check. ?','J♦ 8♣ 3♥',['Miser 2/3','Check'],0,'Top paire top kicker contre un limper : value.'],
+  ['Il paie. Turn 2♠, il check. ?','J♦ 8♣ 3♥ 2♠',['Miser 2/3','Check'],0,'Continue, il paie avec pire.'],
+  ['River K♣, il mise pot. ?','J♦ 8♣ 3♥ 2♠ K♣',['Jeter','Payer','Relancer'],0,'Un limper passif qui mise pot après le roi : KJ, KT (?), deux paires, set. Payer perd souvent. C\'est un fold serré mais défendable ; payer une fois contre un joueur qui bluffe est acceptable.']]},
+ {t:'Défense de grosse blinde',ctx:'35 BB. Le BTN ouvre à 2,2 BB. Tu es en BB.',h:'8♠ 7♠',steps:[
+  ['Préflop ?','',['Payer','Jeter','Tapis'],0,'Assortie connectée face au BTN : défense standard.'],
+  ['Flop 9♠ 6♦ 2♠. Tu check, il mise 1/3. ?','9♠ 6♦ 2♠',['Relancer ×3','Jeter'],0,'Tirage quinte bilatérale + couleur (15 outs) : semi-bluff relance, tu es favori contre beaucoup de mains.']]},
+ {t:'Table finale, gros tapis',ctx:'Table finale, 5 joueurs. Tu es chip leader (50 BB). Un joueur a 3 BB.',h:'T♦ 8♦',steps:[
+  ['Tout le monde passe jusqu\'à toi au BTN. ?','',['Relancer','Jeter'],0,'Chip leader en table finale : pression maximale.'],
+  ['Variante : le 2e tapis (40 BB) pousse avant toi, tu as AJo. ?','',['Jeter','Payer'],0,'Il est le seul à pouvoir te faire mal : resserre contre lui.']]},
+ {t:'Petite blinde contre relance',ctx:'40 BB. Le CO ouvre à 2 BB. Tu es en SB.',h:'K♠ J♥',steps:[
+  ['Préflop ?','',['Jeter','Payer','3-bet'],0,'En SB, KJo est trop faible pour 3-bet et payer te met hors position : jette.']]},
+ {t:'Tirage face à une grosse mise',ctx:'30 BB. Coup à 2 joueurs, turn.',h:'A♣ 5♣',steps:[
+  ['Board K♣ 9♣ 4♦ 2♥. Pot 8 BB, l\'adversaire mise 8 BB. ?','K♣ 9♣ 4♦ 2♥',['Jeter','Payer'],0,'Il faut 33 % ; tu as ≈ 20 % (9 outs). Jette, sauf s\'il reste beaucoup à gagner à la river.']]},
+ {t:'Multiway sans rien',ctx:'50 BB. 4 joueurs voient le flop. Tu étais en BB.',h:'Q♦ 4♣',steps:[
+  ['Flop J♠ 8♥ 7♥. Tout le monde check jusqu\'à toi (dernier). ?','J♠ 8♥ 7♥',['Check','Miser'],0,'À 4, sans rien, sur un board très connecté : check.']]},
+ {t:'Paire moyenne face aux mises',ctx:'60 BB. Tu as relancé au HJ, la BB paie.',h:'9♥ 9♦',steps:[
+  ['Flop Q♠ 6♣ 2♥, la BB check. ?','Q♠ 6♣ 2♥',['Miser 1/3','Check'],0,'Board sec : petit c-bet, ta paire est souvent devant.'],
+  ['Elle paie. Turn A♦, elle mise 2/3. ?','Q♠ 6♣ 2♥ A♦',['Jeter','Payer','Relancer'],0,'La BB qui mise l\'As après avoir payé le flop : ta paire est rarement devant.']]},
+ {t:'3-bet sur ton ouverture',ctx:'80 BB. Tu ouvres au CO, le BTN 3-bet à 7 BB.',h:'A♥ Q♣',steps:[
+  ['Préflop ?','',['Payer','4-bet tapis','Jeter'],2,'Dans le plan simplifié du guide, AQo se couche face au 3-bet du bouton. Tu serais hors position.']]}];
+function renderTrainStats(){const e=$('tstats');if(!e)return;const t=localDay(),names={...MODES,table:'Table (réel)',scenario:'Mises en situation',eval:'Évaluations'};
+ let today=0;const rows=Object.entries(tstats).filter(([m])=>m[0]!=='_').map(([m,x])=>{if(x.day===t)today+=x.today;return`<tr><td>${names[m]||m}</td><td>${x.tot}</td><td>${x.tot?Math.round(x.ok/x.tot*100)+' %':'—'}</td><td>${x.timed?(x.ms/x.timed/1000).toFixed(1)+' s':'—'}</td><td>${x.timed?Math.round((x.fast||0)/x.timed*100)+' %':'—'}</td></tr>`}).join('');
+ $('tgoal').firstChild.textContent=Math.min(today,50)+' / 50';$('tgoalbar').style.width=Math.min(100,today*2)+'%';
+ e.innerHTML=rows||'<tr><td colspan="5" class="mute">Pas encore d\'exercice.</td></tr>'}
+
+function initTraining(){
+ // Guide préflop
+ const f=()=>{const st=$('g-st').value,pos=$('g-pos').value,sit=$('g-sit').value;$('g-op-l').hidden=sit!=='open';$('g-sv-l').hidden=sit!=='shove';
+  const p=prefPlan(st,pos,sit,{opener:sit==='open'?$('g-op').value:null,shoveBB:sit==='shove'?+$('g-sv').value:null}),g=gridPlan(p);
+  $('g-out').innerHTML=`<div class="tip"><b>${p.tip}</b></div><div class="legend">${p.acts.map((a,k)=>`<span><i class="a${k+1}"></i>${a[0]} (${g.pct[k]} %)</span>`).join('')}<span><i style="background:var(--off)"></i>${p.def}</span></div>
+   <div class="chartwrap"><div class="tw"><div class="grid" id="g-grid">${g.html}</div></div>${tableSVG(pos)}</div><div class="detail" id="g-d">Touche une case pour voir l'action.</div>`;
+  $('g-grid').onclick=e=>{const c=e.target.closest('div[title]');if(!c)return;$('g-d').innerHTML=`<b>${handName(c.title)}</b> → <b>${actionFor(p,c.title)}</b>`}};
+ ['g-st','g-pos','g-sit','g-op','g-sv'].forEach(id=>$(id).onchange=f);f();
+ // Guide postflop
+ const pf=()=>{const h=$('p-h').value,s=$('p-s').value,m=$('p-m').checked;$('p-out').innerHTML=`<div class="tip"><b>${POST[h][s]}</b>${m?MULTI:''}</div>`};
+ ['p-h','p-s','p-m'].forEach(id=>$(id).onchange=pf);pf();
+ // Modes d'entraînement
+ $('t-modes').onclick=e=>{const b=e.target.closest('button');if(!b)return;[...$('t-modes').children].forEach(x=>x.setAttribute('aria-pressed',x===b));
+  tableMode($('t-box'),b.dataset.m)};
+ // École : onglets Cours / Guide / Exercices, et modes d'exercices
+ $('ecole-tabs').onclick=e=>{const b=e.target.closest('button');if(!b)return;[...$('ecole-tabs').children].forEach(x=>x.setAttribute('aria-pressed',x===b));
+  ['cours','guide','exos'].forEach(p=>$('p-'+p).hidden=p!==b.dataset.p);if(b.dataset.p==='exos'&&!$('e-box').innerHTML)runner($('e-box'),'mix');refreshClocks()};
+ $('e-modes').onclick=e=>{const b=e.target.closest('button');if(!b)return;[...$('e-modes').children].forEach(x=>x.setAttribute('aria-pressed',x===b));runner($('e-box'),b.dataset.m)};
+ $('t-chrono').value=CHRONO;$('t-chrono').onchange=e=>{CHRONO=+e.target.value;store.set('chrono',CHRONO);const b=$('t-modes').querySelector('[aria-pressed="true"]');b&&b.click()};
+ renderTrainStats();renderProgress()}
+
+// =====================================================================
+// TABLE RÉALISTE : la main se joue sur une table 6-max, avec un chrono
+// autour de ton siège quand c'est à toi de parler
+// =====================================================================
+// Thèmes des 12 premiers coups complets
+['river','preflop','defense','bulle','river','tirage','bulle','preflop','tirage','multiway','cbet','3bet'].forEach((t,i)=>SCEN[i].tag=t);
+// Coups complets supplémentaires (tag = thème, utilisé pour la progression)
+SCEN.push(
+ {t:'Overpaire face à un board mouillé',tag:'cbet',ctx:'50 BB. Tu ouvres au CO, le BTN paie.',h:'Q♠ Q♥',steps:[
+  ['Flop J♥ T♥ 4♣. ?','J♥ T♥ 4♣',['Miser 2/3','Miser 1/3','Check'],0,'Board connecté et bicolore : mise plus gros pour faire payer les tirages.'],
+  ['Il paie. Turn 9♥ (couleur et quinte possibles). Il reste 40 BB. ?','J♥ T♥ 4♣ 9♥',['Check','Miser pot'],0,'La carte complète énormément de tirages : contrôle le pot.'],
+  ['Il mise 1/2 pot. ?','J♥ T♥ 4♣ 9♥',['Jeter','Payer','Tapis'],1,'Un seul paiement est raisonnable : il peut miser des paires ou des tirages sans cœur. Pas de tapis.']]},
+ {t:'Value à la river',tag:'river',ctx:'40 BB. Tu as ouvert au BTN, la BB paie.',h:'K♦ Q♦',steps:[
+  ['Flop K♠ 8♣ 3♦, la BB check. ?','K♠ 8♣ 3♦',['Miser 1/3','Check'],0,'Top paire bon kicker, board sec : petit c-bet.'],
+  ['Elle paie. Turn 5♥, check. ?','K♠ 8♣ 3♦ 5♥',['Miser 2/3','Check'],0,'Value : elle paie avec Kx faibles et 8x.'],
+  ['Elle paie. River 2♣, check. ?','K♠ 8♣ 3♦ 5♥ 2♣',['Miser 2/3','Check'],0,'Troisième mise de value : à 0,25 €, les joueurs paient trop.']]},
+ {t:'Bluff raté en multiway',tag:'multiway',ctx:'45 BB. Tu ouvres au HJ, CO et BB paient.',h:'A♣ J♣',steps:[
+  ['Flop 9♦ 8♦ 6♠, la BB check. ?','9♦ 8♦ 6♠',['Check','Miser 2/3'],0,'À 3, sur un board qui touche les paieurs, sans paire ni tirage : check.'],
+  ['Le CO mise 1/2 pot, la BB paie. ?','9♦ 8♦ 6♠',['Jeter','Payer','Relancer'],0,'Rien contre deux joueurs impliqués : fold.']]},
+ {t:'Set sur board coordonné',tag:'cbet',ctx:'70 BB. Tu paies une relance du HJ au BTN.',h:'7♠ 7♦',steps:[
+  ['Flop 7♥ 8♥ 9♣, le HJ mise 1/2. ?','7♥ 8♥ 9♣',['Relancer','Payer','Jeter'],0,'Set sur board très coordonné : relance pour faire payer et protéger.'],
+  ['Il paie. Turn 2♠, il check. ?','7♥ 8♥ 9♣ 2♠',['Miser 2/3 à pot','Check'],0,'Carte blanche : continue à charger les tirages.']]},
+ {t:'Tapis court, première main',tag:'short',ctx:'11 BB. Tout le monde passe jusqu\'à toi au HJ.',h:'K♥ T♦',steps:[
+  ['Préflop ?','',['Tapis','Relancer 2 BB','Jeter'],0,'KTo est dans la range de push HJ à 10-12 BB.']]},
+ {t:'Payer un tapis court',tag:'short',ctx:'35 BB en BB. Le BTN pousse 7 BB.',h:'Q♣ 8♠',steps:[
+  ['Préflop ?','',['Payer','Jeter'],0,'Tu payes 6 BB pour un pot de 8,5 BB contre une range très large : payer.']]},
+ {t:'Resteal au bouton',tag:'short',ctx:'16 BB. Le CO ouvre à 2 BB, tu es au BTN.',h:'A♠ 9♠',steps:[
+  ['Préflop ?','',['Tapis','Payer','Jeter'],0,'Re-tapis à 16 BB sur une ouverture CO avec A9s : très rentable.']]},
+ {t:'Bulle, gros tapis au BTN',tag:'bulle',ctx:'Bulle. Tu as 45 BB (2e tapis) au BTN. Les blindes ont 12 et 14 BB.',h:'9♥ 6♥',steps:[
+  ['Tout le monde passe. ?','',['Relancer 2 BB','Jeter'],0,'Les blindes ne peuvent pas se défendre largement à la bulle : vole.'],
+  ['La SB (12 BB) pousse. ?','',['Jeter','Payer'],0,'Tu n\'as rien : laisse passer, tu restes gros tapis.']]},
+ {t:'Bulle, tapis moyen',tag:'bulle',ctx:'Bulle. 18 BB en BB. Le chip leader ouvre au BTN.',h:'K♠ J♠',steps:[
+  ['Préflop ?','',['Payer','Tapis','Jeter'],0,'Payer permet de jouer sans risquer tout ton tapis contre le chip leader.'],
+  ['Flop J♥ 7♣ 2♦, tu check, il mise 1/3. ?','J♥ 7♣ 2♦',['Payer','Tapis','Jeter'],0,'Top paire bon kicker : payer garde ses bluffs ; le tapis ne ferait payer que mieux.']]},
+ {t:'Défense BB contre UTG',tag:'defense',ctx:'40 BB en BB. UTG ouvre à 2,2 BB, tout le monde passe.',h:'K♣ 9♦',steps:[
+  ['Préflop ?','',['Jeter','Payer','3-bet'],0,'K9o est dominé par la range UTG : fold, même en BB.']]},
+ {t:'Défense BB, check-raise',tag:'defense',ctx:'30 BB en BB. Le BTN ouvre à 2 BB, tu paies.',h:'6♣ 5♣',steps:[
+  ['Flop 6♥ 5♦ 2♠, tu check, il mise 1/3. ?','6♥ 5♦ 2♠',['Relancer ×3','Payer','Jeter'],0,'Deux paires sur board sec : check-raise pour la value.'],
+  ['Il paie. Turn K♠. ?','6♥ 5♦ 2♠ K♠',['Miser 2/3','Check'],0,'Continue à miser : il paie avec ses paires.']]},
+ {t:'Limper qui se réveille',tag:'river',ctx:'60 BB. Un joueur limpe UTG, tu isoles au BTN avec 4 BB, il paie.',h:'A♦ Q♠',steps:[
+  ['Flop Q♥ 9♣ 5♠, il check. ?','Q♥ 9♣ 5♠',['Miser 1/2','Check'],0,'Top paire top kicker : value.'],
+  ['Il paie. Turn 4♦, il check. ?','Q♥ 9♣ 5♠ 4♦',['Miser 2/3','Check'],0,'Toujours devant ses Qx et 9x.'],
+  ['River 9♥, il mise pot en premier. ?','Q♥ 9♣ 5♠ 4♦ 9♥',['Payer','Jeter'],1,'Un limper passif qui mène pot à la river sur la paire au board : trips très probable. Jette.']]},
+ {t:'3-bet squeeze',tag:'3bet',ctx:'50 BB. Le CO ouvre, le BTN paie, tu es en SB.',h:'Q♦ Q♣',steps:[
+  ['Préflop ?','',['3-bet à 10 BB','Payer','Tapis'],0,'Squeeze pour la value et pour jouer contre un seul adversaire.'],
+  ['Le CO paie. Flop 8♠ 6♣ 2♥. ?','8♠ 6♣ 2♥',['Miser 1/3 à 1/2','Check'],0,'Overpaire sur board sec : mise, il paie avec les paires.']]},
+ {t:'4-bet face à un nit',tag:'3bet',ctx:'70 BB. Tu ouvres au CO avec TT. Un joueur très serré 3-bet du BTN.',h:'T♠ T♦',steps:[
+  ['Préflop ?','',['Jeter','Payer','Tapis'],1,'Contre un nit, TT est rarement devant mais peut toucher un set : payer une fois, pas de tapis.'],
+  ['Flop A♣ K♠ 7♦, il mise 1/3. ?','A♣ K♠ 7♦',['Jeter','Payer'],0,'Board qui touche sa range (AA, KK, AK) : fold.']]},
+ {t:'Table finale, tapis court',tag:'bulle',ctx:'Table finale à 5. Tu as 6 BB en SB, tout le monde passe.',h:'J♦ 4♣',steps:[
+  ['Préflop ?','',['Tapis','Jeter'],0,'SB contre BB à 6 BB : pousse très large, J4o suffit.']]},
+ {t:'Tirage couleur hors position',tag:'tirage',ctx:'40 BB en BB contre le BTN.',h:'8♥ 6♥',steps:[
+  ['Flop K♥ 9♥ 3♣, tu check, il mise 1/3 (pot 5 BB, mise 1,7 BB). ?','K♥ 9♥ 3♣',['Payer','Jeter'],0,'Il faut ≈ 20 % ; tu as ≈ 19 % sur la carte suivante, plus les gains implicites : payer.'],
+  ['Turn 2♠, il mise pot (8 BB). ?','K♥ 9♥ 3♣ 2♠',['Jeter','Payer'],0,'Il faut 33 %, tu as ≈ 20 % : fold.']]},
+ {t:'Cooler préflop',tag:'preflop',ctx:'80 BB. Tu ouvres UTG, le BTN 3-bet, tu 4-bet, il pousse.',h:'K♣ K♥',steps:[
+  ['Préflop ?','',['Payer','Jeter'],0,'KK ne se couche pas préflop à 80 BB à ce niveau.']]},
+ {t:'Gérer une petite paire au flop',tag:'cbet',ctx:'35 BB. Tu ouvres au BTN, la BB paie.',h:'4♠ 4♥',steps:[
+  ['Flop A♦ Q♣ 9♠, check. ?','A♦ Q♣ 9♠',['Check','Miser pot'],0,'Board qui touche ses paieurs, ta paire n\'a pas de valeur : check.'],
+  ['Turn 2♥, elle mise 1/2. ?','A♦ Q♣ 9♠ 2♥',['Jeter','Payer'],0,'Fold : tu bats seulement des bluffs, rares à ce niveau.']]}
+);
+
+// Position du héros, adversaire(s) actif(s) et pot (en BB) à chaque étape des 30 coups complets
+const SCEN_META=[
+ ['CO','BTN',[1.5,6,10,16.7]],['BTN','UTG',[3.5,5.5]],['BTN','BB',[1.5,8.5]],['CO','BTN',[1.5,1.5]],
+ ['CO','UTG',[3.5,12.5,29,67]],['BB','BTN',[3.7,5]],['BTN','CO',[1.5,1.5]],['SB','CO',[3.5]],
+ ['BTN','BB',[8]],['BB',['UTG','CO','BTN'],[8]],['HJ','BB',[4.9,8.1]],['CO','BTN',[10.7]],
+ ['CO','BTN',[5.9,13.7,13.7]],['BTN','BB',[4.9,8.1,18.9]],['HJ',['CO','BB'],[7.1,7.1]],['BTN','HJ',[5.9,23.9]],
+ ['HJ',null,[1.5]],['BB','BTN',[8.5]],['BTN','CO',[3.5]],['BTN','SB',[1.5,15]],
+ ['BB','BTN',[3.7,4.9]],['BB','UTG',[3.7]],['BB','BTN',[4.5,13.5]],['BTN','UTG',[9.5,19,44.4]],
+ ['SB','CO',[5.9,23.2]],['CO','BTN',[10.7,15.5]],['SB','BB',[1.5]],['BB','BTN',[5,8.4]],
+ ['UTG','BTN',[45]],['BTN','BB',[4.5,4.5]]];
+SCEN.forEach((S,i)=>{const m=SCEN_META[i];S.hero=m[0];S.opp=m[1]==null?[]:[].concat(m[1]);S.pots=m[2]});
+const STK={deep:60,mid:30,short:15,push:9};
+const fmtBB=v=>(Math.round(v*10)/10).toString().replace('.',',')+' BB';
+// Construit une situation préflop réaliste (qui a fait quoi avant toi) à partir du guide
+function buildPreflop(force){
+ let pos,sit,st;
+ for(;;){pos=rnd(GPOS);sit=force||rnd(Object.keys(GSIT));st=rnd(Object.keys(GSTACK));const i=GPOS.indexOf(pos);
+  if(sit==='none'&&pos==='BB')continue;if((sit==='limp'||sit==='open'||sit==='shove')&&i===0)continue;if(sit==='threebet'&&pos==='BB')continue;break}
+ const hi=GPOS.indexOf(pos),seats=GPOS.map((p,i)=>({p,name:i===hi?'Toi':'Joueur '+(i+1),stack:i===hi?STK[st]:10+Math.floor(Math.random()*70),bet:p==='SB'?0.5:p==='BB'?1:0,state:'wait'}));
+ const before=GPOS.slice(0,hi).map(p=>GPOS.indexOf(p));
+ const act=(i,st,bet)=>{seats[i].state=st;if(bet!=null)seats[i].bet=bet},opt={};
+ if(sit==='none')before.forEach(i=>act(i,'fold'));
+ if(sit==='limp'){const n=Math.min(before.length,1+(Math.random()<.4));const l=shuffle(before).slice(0,n);before.forEach(i=>act(i,l.includes(i)?'limp':'fold',l.includes(i)?1:null))}
+ if(sit==='open'){const o=rnd(before),sz=STK[st]<=15?2:2.2;opt.opener=GPOS[o];before.forEach(i=>act(i,i===o?'raise':'fold',i===o?sz:null))}
+ if(sit==='shove'){const o=rnd(before);seats[o].stack=6+Math.floor(Math.random()*13);opt.shoveBB=seats[o].stack;before.forEach(i=>act(i,i===o?'allin':'fold',i===o?seats[o].stack:null))}
+ if(sit==='threebet'){const after=GPOS.map((_,i)=>i).filter(i=>i>hi),o=rnd(after);before.forEach(i=>act(i,'fold'));seats[hi].bet=STK[st]<=15?2:2.2;
+  after.forEach(i=>{if(i===o){act(i,'raise',Math.min(seats[i].stack,7))}else act(i,'fold')})}
+ const plan=prefPlan(st,pos,sit,opt),h=pickHand(plan),good=actionFor(plan,h),opts=[...new Set([...plan.acts.map(a=>a[0]),plan.def])];
+ const pot=seats.reduce((a,s)=>a+s.bet,0);
+ return{cat:'pre-'+sit,seats,hero:hi,hand:handCardsRaw(h),board:[],pot,title:`${GSIT[sit]}${opt.opener?' de '+opt.opener:''}${opt.shoveBB?' ('+opt.shoveBB+' BB)':''} · tapis ${GSTACK[st]}`,question:'À toi de parler.',opts,ans:opts.indexOf(good),exp:`${handName(h)} → ${good}. ${plan.tip}`}}
+function handCardsRaw(h){const s1=rnd(SUITS),s2=h.endsWith('s')?s1:rnd(SUITS.filter(x=>x!==s1));return[[h[0],s1],[h[1],s2]]}
+// Convertit une étape de coup complet en table : bonnes positions, pot, et rappel des étapes précédentes
+function buildScenario(S,k,withHistory){const st=S.steps[k],hi=GPOS.indexOf(S.hero),bb=+((S.ctx.match(/(\d+) BB/)||[])[1]||40);
+ const seats=GPOS.map((p,i)=>({p,name:i===hi?'Toi':'Joueur '+(i+1),stack:i===hi?bb:20+((i*37)%60),bet:0,state:i===hi||S.opp.includes(p)?'wait':'fold'}));
+ if(k===0&&!st[1])seats.forEach(x=>{if(x.p==='SB')x.bet=.5;if(x.p==='BB')x.bet=1});
+ const toCards=str=>str?str.split(' ').map(c=>[c.slice(0,-1),SUITS.find(x=>x[0]===c.slice(-1))]):[];
+ const hist=withHistory&&k>0?'Avant : '+S.steps.slice(0,k).map(x=>x[0].replace(/\s*\?$/,'')+' → '+x[2][x[3]]).join(' · ')+'. ':'';
+ return{cat:S.tag||'preflop',seats,hero:hi,hand:toCards(S.h),board:toCards(st[1]),pot:S.pots[k]??null,title:S.t+' — '+S.ctx,question:hist+st[0],opts:st[2],ans:st[3],exp:st[4]}}
+
+// =====================================================================
+// GÉNÉRATEUR DE SITUATIONS APRÈS LE FLOP (illimité)
+// Construit une main réelle correspondant à une catégorie, sur un board cohérent
+// =====================================================================
+const RK='23456789TJQKA',SU=['♠','♥','♦','♣'];
+function conformePostflop(cartes,categorie){
+ if(categorie==='monster')return true;
+ const couleurs=SU.map(s=>cartes.filter(c=>c[1]===s).length);
+ const maxCouleur=Math.max(...couleurs);
+ if(categorie==='draw' ? maxCouleur!==4 : maxCouleur>=4)return false;
+ const rangs=new Set(cartes.map(c=>c[0]));
+ const ordre='A'+RK;
+ for(let i=0;i<=ordre.length-5;i++){
+  if([...ordre.slice(i,i+5)].every(r=>rangs.has(r)))return false;
+ }
+ return true;
+}
+function postflopSpot(forceH){
+ const deck=[];RK.split('').forEach(r=>SU.forEach(s=>deck.push(r+s)));const used=new Set(),take=c=>{used.add(c);return c};
+ const free=(r,s)=>!used.has(r+s),anyOf=r=>{const ss=shuffle(SU).filter(s=>free(r,s));return ss.length?take(r+ss[0]):null};
+ const H=forceH||rnd(Object.keys(PHAND)),sit=rnd(Object.keys(PSIT)),multi=Math.random()<.25,turn=Math.random()<.35;
+ let hand=[],board=[];
+ const lowR=()=>rnd('2345678'.split('')),rr=a=>rnd(a.split(''));
+ do{
+ used.clear();
+ if(H==='monster'){const r=rr('3456789TJQ');hand=[anyOf(r),anyOf(r)];board=[anyOf(r),anyOf(rr('AK')),anyOf(lowR())]}
+ if(H==='top'){const r=rr('AKQJ'),k=r==='A'?'K':'A';hand=[anyOf(r),anyOf(k)];board=[anyOf(r),anyOf(rr('789')),anyOf(rr('2345'))]}
+ if(H==='mid'){const r=rr('6789'),k=rr('2345');hand=[anyOf(r),anyOf(k)];board=[anyOf(rr('KQ')),anyOf(r),anyOf(rr('2345'.replace(k,'')))]}
+ if(H==='draw'){const s=rnd(SU);hand=[take('A'+s),take(rr('JT98')+s)];board=[take('K'+s),take(rr('765')+s),take(rr('432')+rnd(SU.filter(x=>x!==s)))]}
+ if(H==='weak'){hand=[anyOf('A'),anyOf(rr('KQ'))];board=[anyOf(rr('9T')),anyOf(rr('56')),anyOf(rr('23'))]}
+ if(H==='air'){hand=[anyOf(rr('34')),anyOf(rr('67'))];board=[anyOf(rr('AK')),anyOf(rr('QJ')),anyOf(rr('T9'))]}
+ // Couleurs du board : pas de tirage involontaire (sauf catégorie tirage)
+ board=board.filter(Boolean);hand=hand.filter(Boolean);
+ if(turn){let c;do{c=rnd(deck)}while(used.has(c)||c[0]===hand[0][0]||c[0]===hand[1][0]||board.some(b=>b[0]===c[0]));board.push(take(c))}
+ }while(!conformePostflop([...hand,...board],H));
+ // Réponse attendue (règles du guide, versions tranchées pour le générateur)
+ const map={MISER:'Miser',CHECK:'Check',PAYER:'Payer',RELANCER:'Relancer',JETER:'Jeter',TAPIS:'Tapis'};
+ let good=map[POST[H][sit].split(/[ .,;]/)[0]];
+ if(H==='mid'&&sit==='init')good=multi?'Check':'Miser';
+ if(H==='weak'&&sit==='init')good=multi?'Check':'Miser';
+ if(H==='air'&&sit==='init')good='Check';
+ if(H==='draw'&&(sit==='init'||sit==='check'))good=multi?'Check':'Miser';
+ if(multi&&(H==='air'||H==='weak')&&(sit==='init'||sit==='check'))good='Check';
+ const opts=sit==='init'||sit==='check'?['Miser','Check']:sit==='bet'?['Jeter','Payer','Relancer']:['Jeter','Payer','Tapis'];
+ if(!opts.includes(good))good=opts.includes('Tapis')&&good==='Relancer'?'Tapis':opts[1];
+ // Table : héros + 1 ou 2 adversaires, pot cohérent
+ const pos=rnd(['CO','BTN','BB','HJ']),hi=GPOS.indexOf(pos),others=shuffle(GPOS.filter(p=>p!==pos)).slice(0,multi?2:1);
+ const pot=multi?7+Math.round(Math.random()*6):4+Math.round(Math.random()*6),bet=Math.round(pot*rnd([.33,.5,.66])*10)/10;
+ const seats=GPOS.map((p,i)=>({p,name:i===hi?'Toi':'Joueur '+(i+1),stack:i===hi?30+Math.floor(Math.random()*40):20+Math.floor(Math.random()*60),bet:0,state:i===hi||others.includes(p)?'wait':'fold'}));
+ const vi=GPOS.indexOf(others[0]);
+ if(sit==='bet'){seats[vi].state='raise';seats[vi].bet=bet}
+ if(sit==='raise'){seats[hi].bet=bet;seats[vi].state='raise';seats[vi].bet=Math.round(bet*3*10)/10}
+ const street=turn?'Turn':'Flop',q={init:`${street} : tu as relancé avant le flop, on checke vers toi.`,check:`${street} : l'adversaire checke, tu n'as pas relancé avant le flop.`,
+  bet:`${street} : l'adversaire mise ${fmtBB(bet)} dans un pot de ${fmtBB(pot)}.`,raise:`${street} : tu as misé ${fmtBB(bet)}, l'adversaire relance à ${fmtBB(bet*3)}.`}[sit];
+ const toC=c=>[c[0],SUITS.find(x=>x[0]===c[1])];
+ return{cat:'post-'+H,seats,hero:hi,hand:hand.map(toC),board:board.map(toC),pot,title:`Après le flop · ${multi?'3 joueurs':'1 adversaire'}`,
+  question:q,opts,ans:opts.indexOf(good),exp:`Ta main : ${PHAND[H].toLowerCase()}. ${good}. ${POST[H][sit]}${multi?MULTI:''}`}}
+
+const STATE={fold:'Couché',limp:'Limp',raise:'Relance',allin:'TAPIS',wait:''};
+function drawTable(box,T){
+ const slot=p=>(GPOS.indexOf(p)-T.hero+6)%6,cardH=([r,s])=>`<div class="pc sm${s[1]?' red':''}">${r==='T'?'10':r}${s[0]}</div>`;
+ const seatHTML=T.seats.map((s,i)=>{const sl=slot(s.p),me=i===T.hero,out=s.state==='fold';
+  return`<div class="seat s${sl}${me?' me':''}${out?' out':''}">
+   ${me?`<svg class="ring" viewBox="0 0 100 100"><circle cx="50" cy="50" r="46"/><circle class="t" cx="50" cy="50" r="46" pathLength="100"/></svg>`:''}
+   <div class="av">${me?'★':s.name.slice(-1)}</div><div class="nm">${s.name}<span class="pb">${s.p}</span></div><div class="stk">${fmtBB(s.stack)}</div>
+   ${!me&&!out?'<div class="backs"><i></i><i></i></div>':''}
+   ${s.state&&s.state!=='wait'?`<div class="st st-${s.state}">${STATE[s.state]}${s.state!=='fold'&&s.bet?' '+fmtBB(s.bet):''}</div>`:''}
+   ${s.bet&&s.state!=='fold'&&(s.state==='wait')?`<div class="chip">${fmtBB(s.bet)}</div>`:''}
+   ${s.p==='BTN'?'<div class="dealer">D</div>':''}</div>`}).join('');
+ box.innerHTML=`<div class="tb-title">${T.title}</div>
+ <div class="ptable"><div class="felt"><div class="center">${T.pot!=null?`<div class="pot">Pot ${fmtBB(T.pot)}</div>`:''}<div class="board">${T.board.map(cardH).join('')||'<span class="mute">Préflop</span>'}</div></div></div>${seatHTML}
+  <div class="herocards">${T.hand.map(c=>cardH(c).replace('pc sm','pc')).join('')}</div></div>
+ <div class="turn"><span class="tlab2">À toi</span> ${T.question==='À toi de parler.'?'Que fais-tu ?':/\?$/.test(T.question)?T.question.replace(/\.?\s*\?$/,'. Que fais-tu ?'):T.question+' Que fais-tu ?'}</div>
+ <div class="acts">${T.opts.map((o,j)=>`<button data-j="${j}" class="${/jeter|coucher/i.test(o)?'fold':/tapis/i.test(o)?'allin':/check|payer/i.test(o)?'call':'raise'}">${o}</button>`).join('')}</div>
+ <div class="exp"></div><div class="qbar"><span class="score"></span><button class="nx" hidden>Main suivante →</button></div>`}
+
+// =====================================================================
+// NIVEAU ET PROGRESSION DU HÉROS
+// Données dans tstats._prog : jours, thèmes, 100 dernières décisions, évaluations
+// =====================================================================
+const CATS={'pre-none':'Préflop : premier à parler','pre-limp':'Préflop : face aux limps','pre-open':'Préflop : face à une relance','pre-threebet':'Préflop : face à un 3-bet','pre-shove':'Préflop : face à un tapis',
+ cbet:'Continuation bet et flop',river:'Turn / river, value',defense:'Défense de grosse blinde',bulle:'Bulle et table finale',tirage:'Tirages et cotes',multiway:'Coups à plusieurs',
+ '3bet':'3-bet / 4-bet',short:'Tapis court (push/fold)',preflop:'Grosses décisions préflop',
+ 'post-monster':'Après flop : main très forte','post-top':'Après flop : top paire','post-mid':'Après flop : paire moyenne','post-draw':'Après flop : tirage fort','post-weak':'Après flop : petit tirage','post-air':'Après flop : rien'};
+const LEVELS_H=[[0,'Débutant','Apprends les ranges avec le guide et l\'École.'],[50,'Apprenti','Les bases sont là : travaille tes points faibles.'],[65,'Régulier','Bon niveau pour 0,25 € : vise la vitesse.'],[80,'Solide','Prêt pour 0,50 € si la bankroll le permet.'],[90,'Expert','Décisions justes et rapides.']];
+function prog(){const P=tstats._prog??={days:{},cats:{},recent:[],evals:[]};P.misses??=[];return P}
+// Garde les 30 dernières erreurs à la table (situation complète, pour les rejouer)
+function logMiss(T,chosen){const P=prog();P.misses=P.misses.filter(m=>!(m.T.question===T.question&&m.T.hand.join()===T.hand.join()));P.misses.unshift({date:localDay(),chosen,T});P.misses=P.misses.slice(0,30)}
+function clearMiss(T){const P=prog();P.misses=P.misses.filter(m=>!(m.T.question===T.question&&m.T.hand.join()===T.hand.join()))}
+// Enregistre une décision prise à la table
+function logDecision(cat,good,ms){const P=prog(),d=localDay(),fast=good&&ms!=null&&ms<=10000;
+ const D=P.days[d]??={tot:0,ok:0,fast:0};D.tot++;if(good)D.ok++;if(fast)D.fast++;
+ const C=P.cats[cat]??={tot:0,ok:0,fast:0};C.tot++;if(good)C.ok++;if(fast)C.fast++;
+ P.recent.push(good?(fast?2:1):0);if(P.recent.length>100)P.recent.shift()}
+// Score sur les 100 dernières décisions : 60 % justesse + 40 % justesse en ≤ 10 s
+function heroLevel(){const r=prog().recent;if(r.length<20)return null;
+ const acc=r.filter(x=>x>0).length/r.length*100,fast=r.filter(x=>x===2).length/r.length*100,score=Math.round(acc*.6+fast*.4);
+ let i=0;LEVELS_H.forEach((l,k)=>{if(score>=l[0])i=k});return{score,acc,fast,i,n:r.length}}
+// Points faibles : thèmes avec la plus faible réussite (au moins 5 essais)
+function weakCats(){return Object.entries(prog().cats).filter(([,c])=>c.tot>=5).map(([k,c])=>({k,acc:c.ok/c.tot,tot:c.tot})).sort((a,b)=>a.acc-b.acc)}
+// Tire un thème en privilégiant les erreurs et les thèmes jamais travaillés
+const playable=k=>k.startsWith('pre-')||k.startsWith('post-')||SCEN.some(s=>s.tag===k);
+function pickWeakCat(){const P=prog().cats,keys=Object.keys(CATS).filter(playable);
+ const w=keys.map(k=>{const c=P[k];return !c||c.tot<5?1:Math.max(.05,1-c.ok/c.tot)+.05});let r=Math.random()*w.reduce((a,b)=>a+b,0);
+ for(let i=0;i<keys.length;i++){r-=w[i];if(r<=0)return keys[i]}return keys[0]}
+
+function renderProgress(){const el=$('hero-lv');if(!el)return;const L0=heroLevel(),P=prog();
+ if(!L0){el.innerHTML=`<div class="lvbadge">?</div><div><b>Niveau à déterminer</b><div class="mute">Encore ${20-P.recent.length} décisions à la table, ou passe l'évaluation.</div></div>`}
+ else{const cur=LEVELS_H[L0.i],nx=LEVELS_H[L0.i+1];
+  el.innerHTML=`<div class="lvbadge">${L0.score}</div><div><b>${cur[1]}</b><div class="mute">${cur[2]}</div>
+   <div class="mute">Justesse ${Math.round(L0.acc)} % · justes en ≤ 10 s ${Math.round(L0.fast)} % · sur ${L0.n} décisions</div>
+   ${nx?`<div class="bar"><i style="width:${Math.min(100,(L0.score-cur[0])/(nx[0]-cur[0])*100)}%"></i></div><div class="mute">Prochain niveau : ${nx[1]} à ${nx[0]} points</div>`:''}</div>`}
+ // Courbe des 14 derniers jours
+ const days=[];for(let k=13;k>=0;k--){const d=new Date();d.setDate(d.getDate()-k);const key=localDay(d);days.push([key,P.days[key]])}
+ const W=640,H=180,L=36,R=10,T=10,B=26,x=i=>L+i/13*(W-L-R),y=v=>T+(1-v/100)*(H-T-B);
+ let g='';[0,50,80,100].forEach(v=>g+=`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)" ${v===80?'stroke-dasharray="4 4"':''}/><text x="${L-6}" y="${y(v)+4}" text-anchor="end">${v}%</text>`);
+ const line=(f,col)=>{const pts=days.map((d,i)=>d[1]?[x(i),y(f(d[1]))]:null).filter(Boolean);if(!pts.length)return'';
+  return`<path d="${pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ')}" fill="none" stroke="${col}" stroke-width="2.5"/>`+pts.map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="3.5" fill="${col}"/>`).join('')};
+ g+=line(d=>d.ok/d.tot*100,'var(--felt)')+line(d=>d.fast/d.tot*100,'var(--gold)');
+ days.forEach((d,i)=>{if(i%2===0)g+=`<text x="${x(i)}" y="${H-6}" text-anchor="middle">${d[0].slice(8)}/${d[0].slice(5,7)}</text>`});
+ $('prog-chart').innerHTML=g;
+ // Points faibles
+ const wk=weakCats();
+ $('weak').innerHTML=wk.length?wk.slice(0,5).map(w=>`<div class="wrow"><span>${CATS[w.k]||w.k}</span><div class="bar"><i style="width:${Math.round(w.acc*100)}%;background:${w.acc<.6?'var(--loss)':w.acc<.8?'var(--gold)':'var(--felt)'}"></i></div><b>${Math.round(w.acc*100)} %</b></div>`).join('')
+  :'<p class="mute">Pas encore assez de données : il faut au moins 5 décisions sur un thème.</p>';
+ // Erreurs récentes
+ const M=P.misses||[];$('misses').innerHTML=M.length?`<div class="tw"><table><thead><tr><th>Date</th><th>Situation</th><th>Ta main</th><th>Ton choix</th><th>Bonne réponse</th></tr></thead><tbody>${M.slice(0,10).map(m=>`<tr><td>${m.date.slice(5).split('-').reverse().join('/')}</td><td>${m.T.title}</td><td>${m.T.hand.map(c=>(c[0]==='T'?'10':c[0])+c[1][0]).join(' ')}</td><td class="n">${m.chosen}</td><td class="p">${m.T.opts[m.T.ans]}</td></tr>`).join('')}</tbody></table></div>`:'<p class="mute">Aucune erreur enregistrée.</p>';
+ // Historique des évaluations
+ $('evals').innerHTML=P.evals.length?P.evals.slice(-6).reverse().map(e=>`<tr><td>${e.date}</td><td>${e.score}</td><td>${LEVELS_H[e.lv][1]}</td><td>${e.ok}/${e.tot}</td></tr>`).join(''):'<tr><td colspan="4" class="mute">Aucune évaluation pour l\'instant.</td></tr>'}
+
+// =====================================================================
+// TABLE : modes
+// kind : 'mix' (préflop + après-flop + coups complets), 'scenario', 'preflop', 'postflop',
+//        'weak' (axé sur les points faibles), 'eval' (évaluation 20 décisions, chrono 10 s)
+// =====================================================================
+function tableMode(box,kind='mix'){let ok=0,tot=0,fastN=0,queue=[],order=shuffle(SCEN.map((_,i)=>i)),si=0;
+ box.clock?.stop();
+ const EVAL_N=20,evalCats=shuffle(Object.keys(CATS).filter(playable)),res={};
+ const scenFor=tag=>{const S=rnd(SCEN.filter(s=>s.tag===tag));S.steps.forEach((_,k)=>queue.push([buildScenario(S,k),k<S.steps.length-1]))};
+ const next=()=>{let T,after;
+  if(kind==='eval'&&tot>=EVAL_N)return evalEnd();
+  if(kind==='errors'){const P=prog();P.misses=P.misses.filter(({T})=>{
+   if(T.title?.startsWith('3-bet sur ton ouverture —'))return !T.board.length&&T.opts[T.ans]==='Jeter';
+   if(T.cat==='post-draw')return conformePostflop([...T.hand,...T.board].map(([r,s])=>r+s[0]),'draw');
+   return true;
+  });if(!P.misses.length){box.innerHTML='<div class="tb-title">Mes erreurs</div><p style="color:var(--ink)">Aucune erreur à rejouer. Bravo !</p>';return}T=P.misses[0].T;after=false}
+  else if(queue.length){[T,after]=queue.shift()}
+  else{let cat=null;
+   if(kind==='weak')cat=pickWeakCat();
+   if(kind==='eval')cat=evalCats[tot%evalCats.length];
+   // Évaluation : une seule décision par coup complet, pour équilibrer les thèmes
+   if(cat&&cat.startsWith('post-'))T=postflopSpot(cat.slice(5));
+   else if(cat&&cat.startsWith('pre-'))T=buildPreflop(cat.slice(4));
+   // Évaluation : une seule décision par coup complet, avec le rappel des étapes précédentes
+   else if(cat&&kind==='eval'){const S=rnd(SCEN.filter(x=>x.tag===cat));T=buildScenario(S,Math.random()*S.steps.length|0,true);after=false}
+   else if(cat){scenFor(cat);[T,after]=queue.shift()}
+   else if(kind==='scenario'||(kind==='mix'&&Math.random()<0.35)){const S=SCEN[order[si++%order.length]];S.steps.forEach((_,k)=>queue.push([buildScenario(S,k),k<S.steps.length-1]));[T,after]=queue.shift()}
+   else if(kind==='postflop'||(kind==='mix'&&Math.random()<.45))T=postflopSpot();
+   else T=buildPreflop()}
+  box.clock?.stop();drawTable(box,T);
+  if(kind==='eval')box.querySelector('.tb-title').textContent=`Évaluation · décision ${tot+1}/${EVAL_N} · chrono 10 s — `+T.title;
+  if(kind==='errors')box.querySelector('.tb-title').textContent=`Rejouer mes erreurs (${prog().misses.length}) — `+T.title;
+  if(kind==='weak')box.querySelector('.tb-title').textContent=`Points faibles · ${CATS[T.cat]||''} — `+T.title;
+  const C=kind==='eval'?10:CHRONO,ring=box.querySelector('.ring .t'),lab=box.querySelector('.tlab2'),o=box.querySelector('.acts'),nx=box.querySelector('.nx');
+  nx.textContent=after?'Suite du coup →':kind==='eval'&&tot+1>=EVAL_N?'Voir le résultat →':'Main suivante →';nx.onclick=next;
+  const answer=(b,late)=>{if(o.dataset.done)return;o.dataset.done=1;const ms=stop(),good=!late&&+b.dataset.j===T.ans;tot++;if(good)ok++;if(good&&C&&ms<=10000)fastN++;
+   tstat(kind==='eval'?'eval':'table',good,C?ms:null);logDecision(T.cat,good,C?ms:null);if(good)clearMiss(T);else logMiss(T,b?T.opts[+b.dataset.j]:'temps écoulé');store.set('entrainement',tstats);renderProgress();
+   const r=res[T.cat]??={ok:0,tot:0};r.tot++;if(good)r.ok++;
+   box.querySelector('.ptable').classList.add('done');
+   if(b)b.classList.add(good?'good':'bad');o.querySelector(`[data-j="${T.ans}"]`).classList.add('good');
+   box.querySelector('.exp').textContent=(late?'Temps écoulé ! ':good?`Bonne décision en ${(ms/1000).toFixed(1)} s. `:'Pas la meilleure. ')+T.exp;
+   box.querySelector('.score').textContent=`Décisions justes : ${ok}/${tot}`;nx.hidden=false;nx.focus()};
+  o.onclick=e=>{const b=e.target.closest('button');if(b)answer(b,false)};
+  if(!C)box.querySelector('.ring').style.display='none';
+  const stop=decisionClock(box,C,left=>{
+   const f=left/(C*1000);
+   ring.style.strokeDashoffset=100-f*100;ring.classList.toggle('hot',f<.3);
+   lab.textContent=`À toi · ${(left/1000).toFixed(1)} s`;
+  },()=>answer(null,true))};
+ // Fin d'évaluation : score, niveau, détail par thème, enregistrement
+ const evalEnd=()=>{const acc=ok/tot*100,fast=fastN/tot*100,score=Math.round(acc*.6+fast*.4);let lv=0;LEVELS_H.forEach((l,k)=>{if(score>=l[0])lv=k});
+  prog().evals.push({date:localDay(),score,lv,ok,tot});store.set('entrainement',tstats);renderProgress();
+  const rows=Object.entries(res).sort((a,b)=>a[1].ok/a[1].tot-b[1].ok/b[1].tot).map(([k,v])=>`<tr><td>${CATS[k]||k}</td><td>${v.ok}/${v.tot}</td></tr>`).join('');
+  box.innerHTML=`<div class="tb-title">Résultat de l'évaluation</div><div class="evalres"><div class="lvbadge big2">${score}</div><div><h2 style="color:var(--ink)">${LEVELS_H[lv][1]}</h2><p>${LEVELS_H[lv][2]}</p>
+   <p class="mute">Décisions justes ${ok}/${tot} (${Math.round(acc)} %) · justes en ≤ 10 s ${Math.round(fast)} %</p></div></div>
+   <div class="tw"><table class="evt"><thead><tr><th>Thème</th><th>Résultat</th></tr></thead><tbody>${rows}</tbody></table></div>
+   <div class="row" style="margin-top:12px"><button class="main" id="ev-weak">Travailler mes points faibles</button><button id="ev-again">Refaire l'évaluation</button></div>`;
+  $('ev-weak').onclick=()=>$('t-modes').querySelector('[data-m="weak"]').click();$('ev-again').onclick=()=>tableMode(box,'eval')};
+ next()}
+
+// =====================================================================
+// NAVIGATION ENTRE LES VUES (liens directs : #stats, #ecole, #cours6, #final…)
+// =====================================================================
+const VIEWS=['accueil','tournois','stats','ecole','entrainement','regles'];
+function go(v,lesson){VIEWS.forEach(x=>$('v-'+x).hidden=x!==v);
+ if(v==='entrainement'&&!$('t-box').hasChildNodes())tableMode($('t-box'),'weak');
+ refreshClocks();
+ [...$('menu').children].forEach(b=>b.setAttribute('aria-current',b.dataset.v===v));
+ if(v==='ecole')show(lesson??curLesson);scrollTo(0,0)}
+$('menu').onclick=e=>{const b=e.target.closest('button');if(b)go(b.dataset.v)};
+$('go-add').onclick=()=>{go('tournois');$('g').focus()};
+$('go-school').onclick=()=>go('ecole');
+$('period').onclick=e=>{const b=e.target.closest('button');if(!b)return;PERIOD=+b.dataset.p;[...$('period').children].forEach(x=>x.setAttribute('aria-pressed',x===b));render()};
+initTraining();
+curLesson=Math.min(L.length+1,+store.get('cours',0)||0);
+const hash=location.hash.slice(1),m=hash.match(/^cours(\d+)$/);
+if(m)go('ecole',Math.max(0,Math.min(L.length,+m[1])-1));else if(hash==='final')go('ecole',L.length);else if(hash==='revision')go('ecole',L.length+1);else go(VIEWS.includes(hash)?hash:'accueil');
+render();
+
+// =====================================================================
+// STOCKAGE (collections "sessions" et "progress", lisibles par Claude)
+// =====================================================================
+useCap('db').then(d=>{db=d;if(!db)return;initSauvegardes();
+ db.collection('sessions').onSnapshot(s=>{list=s.docs.map(x=>({id:x.id,...x.data}));render()});
+ db.doc('progress/ecole').get().then(p=>{const x=p&&p.exists?p.data:null;if(x)mergeProgress(x);syncProgress()}).catch(()=>{})});
+// Fusionne la progression enregistrée (autre appareil) avec celle de ce navigateur, sans doublon
+function mergeProgress(x){
+ (x.coursFaits||[]).forEach(k=>done.add(k));(x.erreursQ||[]).forEach(k=>errs.add(k));
+ const seen=new Set(errHands.map(h=>h.sit+h.hand));(x.erreursMains||[]).forEach(h=>{if(!seen.has(h.sit+h.hand))errHands.push(h)});errHands=errHands.slice(0,30);
+ const R0=x.entrainement||{};Object.entries(R0).forEach(([k,v])=>{if(k==='_prog')return;if(!tstats[k]||(v.tot||0)>(tstats[k].tot||0))tstats[k]=v});
+ if(R0._prog){const A=prog(),B=R0._prog;
+  ['days','cats'].forEach(f=>Object.entries(B[f]||{}).forEach(([k,v])=>{if(!A[f][k]||v.tot>A[f][k].tot)A[f][k]=v}));
+  if((B.recent||[]).length>A.recent.length)A.recent=B.recent;
+  const ek=e=>e.date+e.score+e.ok;const E=new Set(A.evals.map(ek));(B.evals||[]).forEach(e=>{if(!E.has(ek(e)))A.evals.push(e)});A.evals.sort((a,b)=>a.date.localeCompare(b.date));
+  const mk=m=>m.T.question+m.T.hand.join();const Ms=new Set(A.misses.map(mk));(B.misses||[]).forEach(m=>{if(!Ms.has(mk(m)))A.misses.push(m)});A.misses=A.misses.slice(0,30)}
+ store.set('entrainement',tstats);updateBadges();renderTrainStats();renderProgress()}
+</script>

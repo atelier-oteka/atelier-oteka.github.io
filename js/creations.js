@@ -90,13 +90,14 @@ const CREATIONS = [
       "Ton niveau de Débutant à Expert, tes points faibles travaillés en priorité, tes erreurs à rejouer",
       "Données dans un fichier avec sauvegardes datées, restaurables depuis le logiciel"
     ],
-    version: "1.0.0",
-    date: "2026-09-29",
-    plateforme: "Windows 10 / 11",
-    taille: "8,3 Mo",
+    version: "1.0.1",
+    date: "2026-11-22",
+    plateforme: "Windows 10 / 11 (64 bits)",
+    taille: "650 Ko",
     image: "images/grind-poker.png?v=2026-09-29",
-    fichier: "telechargements/GrindPoker-Installation-1.0.0.exe",
+    fichier: "telechargements/GrindPoker-Installation-1.0.1.exe",
     historique: [
+      { version: "1.0.1", date: "2026-11-22", changements: ["Sauvegarde des tournois confirmée et résultat réinitialisé après chaque saisie", "Pause automatique du chrono lorsque la table est masquée", "Tirages couleur et scénario AQo corrigés", "Mise à jour Windows avec reprise du carnet existant"] },
       { version: "1.0.0", date: "2026-09-29", changements: ["Première version : bankroll, école, entraînement sur table avec chrono, niveau et points faibles"] }
     ],
     note: "Conçu pour les tournois 6 joueurs Monster Stack en petites limites. L'installateur ne demande aucun droit administrateur et conserve vos données en cas de désinstallation. Grind Poker aide à apprendre, il ne garantit aucun gain."

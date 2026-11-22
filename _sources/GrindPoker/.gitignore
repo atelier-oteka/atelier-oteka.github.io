@@ -1,0 +1,13 @@
+# Fichiers système Windows/macOS
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Copie de travail générée par le script de compilation (source : index.html)
+desktop/web/
+
+# Exécutables compilés : publiés sur le site, pas dans le dépôt
+dist/
+
+# Anciennes copies generees par l application Claude (non versionnees)
+Claude outputs/
