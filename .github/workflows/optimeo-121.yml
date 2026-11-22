@@ -1,0 +1,64 @@
+name: Construire et tester Optimeo 1.2.1
+on:
+  push:
+    branches: ['construction/optimeo-1.2.1']
+    paths: ['optimeo/construction-1.2.1.zip', '.github/workflows/optimeo-121.yml']
+permissions:
+  contents: write
+jobs:
+  installer:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        shell: powershell
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Extraire les sources et vérifier les parcours
+        run: |
+          Expand-Archive -LiteralPath optimeo/construction-1.2.1.zip -DestinationPath "$env:RUNNER_TEMP/optimeo"
+          & "$env:RUNNER_TEMP/optimeo/verification.ps1"
+      - name: Compiler le lanceur et l'installateur
+        run: |
+          $project = "$env:RUNNER_TEMP/optimeo/Optimeo-1.2.1"
+          if (-not (Test-Path "${env:ProgramFiles(x86)}\NSIS\makensis.exe")) {
+            choco install nsis --yes --no-progress
+            if ($LASTEXITCODE) { throw 'Installation de NSIS impossible' }
+          }
+          New-Item -Type Directory -Path "$project/dist" -Force | Out-Null
+          & "$project/installateur/construire.ps1"
+          $exe = Get-Item "$project/dist/Optimeo-Installation-1.2.1.exe" -ErrorAction Stop
+          if ($exe.VersionInfo.ProductVersion -ne '1.2.1') { throw 'Version incorrecte' }
+      - name: Tester installation, interface et désinstallation sur la VM
+        run: |
+          $project = "$env:RUNNER_TEMP/optimeo/Optimeo-1.2.1"
+          $exe = "$project/dist/Optimeo-Installation-1.2.1.exe"
+          $target = "$env:ProgramFiles/Optimeo"
+          if (Test-Path $target) { throw 'Installation existante sur la VM' }
+          $p = Start-Process -FilePath $exe -ArgumentList '/S' -PassThru -Wait
+          if ($p.ExitCode -ne 0) { throw "Installation en échec $($p.ExitCode)" }
+          $expected = @('OptimiseurPC.ps1','LISEZMOI.md','interface/Fenetre.xaml','interface/logo.ico','interface/logo.png')
+          $expected += Get-ChildItem "$project/modules" -Filter *.ps1 | ForEach-Object { "modules/$($_.Name)" }
+          foreach ($file in $expected) {
+            if ((Get-FileHash "$project/$file").Hash -ne (Get-FileHash "$target/$file").Hash) { throw "Fichier différent : $file" }
+          }
+          if ((Get-FileHash "$project/installateur/Lanceur/Optimeo.exe").Hash -ne (Get-FileHash "$target/Optimeo.exe").Hash) { throw 'Lanceur différent' }
+          . "$target/modules/Utilitaires.ps1"
+          Assert-FichierProtege $script:DossierSauvegardes
+          Add-Type -AssemblyName PresentationFramework
+          [xml]$layout=Get-Content "$target/interface/Fenetre.xaml" -Raw -Encoding UTF8
+          $window=[Windows.Markup.XamlReader]::Load((New-Object Xml.XmlNodeReader $layout))
+          if ($window.FindName('Onglets').Items.Count -ne 8) { throw 'Interface installée incorrecte' }
+          $p = Start-Process -FilePath "$target/Desinstaller.exe" -ArgumentList '/S' -Wait -PassThru
+          if ($p.ExitCode -ne 0 -or (Test-Path "$target/OptimiseurPC.ps1")) { throw 'Désinstallation incomplète' }
+          Copy-Item -LiteralPath $exe -Destination optimeo/Optimeo-Installation-1.2.1.exe
+          (Get-FileHash optimeo/Optimeo-Installation-1.2.1.exe).Hash
+      - name: Déposer uniquement le binaire testé sur la branche de construction
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add --force -- optimeo/Optimeo-Installation-1.2.1.exe
+          git commit -m "Conserver l’installateur Optimeo 1.2.1 testé sur Windows"
+          if ($LASTEXITCODE) { throw 'Commit impossible' }
+          git push origin HEAD:refs/heads/construction/optimeo-1.2.1
+          if ($LASTEXITCODE) { throw 'Dépôt du binaire impossible' }
