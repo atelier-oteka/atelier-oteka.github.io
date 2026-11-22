@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Téléchargez les jeux et logiciels Windows de Franck et consultez leur historique.">
+  <meta name="theme-color" content="#15131c">
+  <link rel="icon" href="images/logo.svg">
+  <link rel="stylesheet" href="css/atelier.css">
+  <title>Téléchargements — L’Atelier d’Oteka</title>
+</head>
+<body><header class="top"><div class="wrap topline">
+  <a class="brand" href="index.html"><img src="images/logo.svg" width="30" height="30" alt="">L’Atelier d’Oteka</a>
+  <nav class="mainnav" aria-label="Navigation principale">
+    <a href="index.html#catalogue">Catalogue</a>
+    <a href="telechargements.html" aria-current="page">Téléchargements</a>
+  </nav>
+</div></header>
+<main>
+  <section class="download-hero"><div class="wrap"><a class="back" href="index.html#catalogue">← Retour au catalogue</a>
+  <h1>Téléchargements<span class="dot">.</span></h1><p>Mes jeux et logiciels pour Windows, avec leur historique de versions.</p></div></section>
+  <section class="wrap collection" id="creations" aria-label="Fichiers à télécharger">
+    <div class="tools"><div class="filtres" role="group" aria-label="Filtrer par type">
+          <button class="filtre actif" data-filtre="tous">Tous <span class="compteur" data-compteur="tous">0</span></button>
+          <button class="filtre" data-filtre="logiciel">Logiciels <span class="compteur" data-compteur="logiciel">0</span></button>
+          <button class="filtre" data-filtre="jeu">Jeux <span class="compteur" data-compteur="jeu">0</span></button>
+        </div><label class="search"><span aria-hidden="true" class="lens"></span><input id="recherche" type="search" aria-label="Rechercher un téléchargement" placeholder="Rechercher un téléchargement"></label></div>
+    <div id="grille" class="grille" aria-live="polite"></div><p id="vide" class="empty" hidden></p>
+  </section><section class="wrap about" id="apropos"><h2>À propos</h2><p id="site-apropos"></p></section>
+</main><footer><div class="wrap foot"><a class="brand" href="index.html"><img src="images/logo.svg" width="25" height="25" alt="">L’Atelier d’Oteka</a><a href="telechargements.html#creations">Téléchargements et versions</a></div></footer>
+<script src="js/creations.js"></script><script src="js/app.js"></script></body></html>

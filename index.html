@@ -1,83 +1,129 @@
-<!DOCTYPE html>
-<!--
-  index.html — Page unique du site de téléchargement.
-  Le contenu (liste des créations, nom du site) est défini dans js/creations.js.
-  L'affichage est généré par js/app.js. Aucune modification nécessaire ici
-  pour ajouter une création.
--->
+<!doctype html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>L'Atelier d'Oteka</title>
-  <meta name="description" content="Logiciels et jeux à télécharger gratuitement.">
-  <link rel="icon" type="image/svg+xml" href="images/logo.svg">
-  <link rel="apple-touch-icon" href="images/logo-512.png">
-  <link rel="stylesheet" href="css/style.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Les jeux, applications, guides et vidéos de Franck.">
+  <meta name="theme-color" content="#15131c">
+  <link rel="icon" href="images/logo.svg">
+  <link rel="stylesheet" href="css/atelier.css">
+  <title>Catalogue — L’Atelier d’Oteka</title>
 </head>
-<body>
-
-  <!-- En-tête : nom du site + navigation -->
-  <header class="entete">
-    <div class="conteneur entete__contenu">
-      <!-- Le nom est dans un <span> séparé : app.js le remplace sans effacer l'image -->
-      <a href="#" class="logo">
-        <img class="logo__image" src="images/logo.svg" alt="" width="32" height="32">
-        <span id="site-nom">L'Atelier d'Oteka</span>
-      </a>
-      <nav class="nav">
-        <a href="#creations">Créations</a>
-        <a href="#apropos">À propos</a>
-      </nav>
-    </div>
-  </header>
-
-  <main>
-    <!-- Bandeau d'accueil -->
-    <section class="hero">
-      <div class="conteneur">
-        <h1 id="site-titre">Mes logiciels et jeux</h1>
-        <p id="site-description" class="hero__texte">Téléchargez gratuitement mes créations.</p>
-      </div>
-    </section>
-
-    <!-- Liste des créations -->
-    <section id="creations" class="conteneur section">
-      <!-- Barre d'outils : filtres par type + recherche -->
-      <div class="outils">
-        <div class="filtres" role="tablist" aria-label="Filtrer par type">
-          <button class="filtre actif" data-filtre="tous">Tous <span class="compteur" data-compteur="tous">0</span></button>
-          <button class="filtre" data-filtre="logiciel">Logiciels <span class="compteur" data-compteur="logiciel">0</span></button>
-          <button class="filtre" data-filtre="jeu">Jeux <span class="compteur" data-compteur="jeu">0</span></button>
-        </div>
-        <input type="search" id="recherche" class="recherche" placeholder="Rechercher…" aria-label="Rechercher une création">
-      </div>
-
-      <!-- Grille remplie par app.js -->
-      <div id="grille" class="grille" aria-live="polite"></div>
-
-      <!-- Message affiché quand aucune création ne correspond -->
-      <p id="vide" class="vide" hidden>Aucune création pour le moment. Revenez bientôt !</p>
-    </section>
-
-    <!-- À propos -->
-    <section id="apropos" class="conteneur section apropos">
-      <h2>À propos</h2>
-      <p id="site-apropos">Je crée des logiciels et des jeux sur mon temps libre.</p>
-    </section>
-  </main>
-
-  <footer class="pied">
-    <div class="conteneur">
-      <p>© <span id="annee"></span> <span id="site-auteur">Franck</span></p>
-    </div>
-  </footer>
-
-  <!-- Ordre important : les données d'abord, puis le script d'affichage.
-       Le ?v= force les navigateurs à recharger les scripts au lieu de servir
-       une version gardée en cache : CHANGER CETTE DATE à chaque publication,
-       sinon les visiteurs ne verront pas la nouvelle création. -->
-  <script src="js/creations.js?v=2026-09-20"></script>
-  <script src="js/app.js?v=2026-09-20"></script>
-</body>
-</html>
+<body><header class="top"><div class="wrap topline">
+  <a class="brand" href="index.html"><img src="images/logo.svg" width="30" height="30" alt="">L’Atelier d’Oteka</a>
+  <nav class="mainnav" aria-label="Navigation principale">
+    <a href="#catalogue" aria-current="page">Catalogue</a>
+    <a href="telechargements.html">Téléchargements</a>
+  </nav>
+</div></header>
+<main>
+  <section class="hero"><div class="hero-art" aria-hidden="true"></div><div class="wrap hero-inner">
+    <div class="hero-copy"><p class="kicker"><i></i> Atelier indépendant</p>
+    <h1>Les créations<br><em>de Franck.</em></h1>
+    <p class="intro">Jeux PC et mobile, logiciels, guides et vidéos.<br>Tout mon atelier, au même endroit.</p>
+    <a class="action" href="#catalogue">Explorer le catalogue <span aria-hidden="true">↓</span></a>
+    </div></div></section>
+  <section id="catalogue" class="wrap collection" aria-labelledby="catalogue-title">
+    <div class="sectionhead"><h2 id="catalogue-title">Le catalogue<span class="dot">.</span></h2><label class="search"><span aria-hidden="true" class="lens"></span><input id="q" type="search" aria-label="Rechercher une création" placeholder="Rechercher une création"></label></div>
+    <nav class="bar" aria-label="Catégories"><button data-category="-1" aria-pressed="true">Tout</button>
+<button data-category="0" aria-pressed="false">Jeux</button>
+<button data-category="1" aria-pressed="false">Applications et logiciels</button>
+<button data-category="2" aria-pressed="false">Sites et guides</button>
+<button data-category="3" aria-pressed="false">Vidéos et chaînes</button>
+<button data-category="4" aria-pressed="false">Prototypes et archives</button></nav>
+    <div class="subrow"><p aria-live="polite" id="result">23 créations</p><div class="devices" role="group" aria-label="Jeux par plateforme"><span>Jeux par plateforme</span><button data-platform="Mobile" aria-pressed="false">Mobile</button><button data-platform="PC" aria-pressed="false">PC</button></div></div>
+    <div class="cards"><article data-group="0" data-device="Mobile">
+    <div class="visual photo" style="--tint:#70666d"><img class="cover" src="images/inventions.jpg" alt="" loading="lazy"><span class="device">Mobile</span></div>
+    <div class="body"><span class="meta">Construction</span><h3>L’Atelier des inventions</h3><p>Choisissez un plan, réunissez les matériaux et assemblez votre invention.</p></div>
+  </article>
+<article data-group="0" data-device="PC">
+    <div class="visual photo" style="--tint:#244a57"><img class="cover" src="images/mma.jpg" alt="" loading="lazy"><span class="device">PC</span></div>
+    <div class="body"><span class="meta">Gestion sportive</span><h3>MMA Manager</h3><p>Gérez la carrière d’un agent et de son club dans un monde de MMA simulé.</p></div>
+  </article>
+<article data-group="0" data-device="PC">
+    <div class="visual photo" style="--tint:#33423e"><img class="cover" src="images/poker.jpg" alt="" loading="lazy"><span class="device">PC</span></div>
+    <div class="body"><span class="meta">Poker</span><h3>Hold’Up</h3><p>Apprenez le poker en jouant un tournoi contre des adversaires virtuels avec un coach.</p><a download href="telechargements/HoldUp-Installation-0.5.0.exe">Télécharger pour Windows</a></div>
+  </article>
+<article data-group="0" data-device="PC">
+    <div class="visual poster" style="--tint:#655344"><span class="lettermark" aria-hidden="true">DC</span><span class="device">PC</span></div>
+    <div class="body"><span class="meta">Aventure narrative</span><h3>Le Dernier Chasseur</h3><p>Quatre chasseurs enquêtent sur les disparitions du village de Sombreval.</p></div>
+  </article>
+<article data-group="0" data-device="PC">
+    <div class="visual poster" style="--tint:#815047"><span class="lettermark" aria-hidden="true">E</span><span class="device">PC</span></div>
+    <div class="body"><span class="meta">Survie</span><h3>EMBERWILD</h3><p>Explorez la forêt, récoltez des ressources et préparez-vous à la nuit.</p></div>
+  </article>
+<article data-group="0" data-device="Mobile">
+    <div class="visual poster" style="--tint:#53526b"><span class="lettermark" aria-hidden="true">P</span><span class="device">Mobile</span></div>
+    <div class="body"><span class="meta">Poker</span><h3>PokerLab</h3><p>Travaillez vos décisions au poker six joueurs à travers des situations corrigées.</p></div>
+  </article>
+<article data-group="1" data-device="PC">
+    <div class="visual poster" style="--tint:#70666d"><img class="emblem" src="images/grind-poker.png" alt="" loading="lazy"><span class="device">PC</span></div>
+    <div class="body"><span class="meta">Poker</span><h3>Grind Poker</h3><p>Suivi de bankroll, cours et entraînement chronométré au poker.</p><a download href="telechargements/GrindPoker-Installation-1.0.0.exe">Télécharger pour Windows</a></div>
+  </article>
+<article data-group="1" data-device="PC">
+    <div class="visual poster" style="--tint:#244a57"><img class="emblem" src="images/mainscope-1.0.0.png" alt="" loading="lazy"><span class="device">PC</span></div>
+    <div class="body"><span class="meta">Poker</span><h3>Mainscope</h3><p>Étudiez une situation de poker à partir de votre position, de votre tapis et de votre main.</p><a download href="telechargements/Mainscope-Installation-2.3.0.exe">Télécharger pour Windows</a></div>
+  </article>
+<article data-group="1" data-device="PC">
+    <div class="visual poster" style="--tint:#33423e"><img class="emblem" src="images/fluidoscope.png" alt="" loading="lazy"><span class="device">PC</span></div>
+    <div class="body"><span class="meta">Affichage</span><h3>Fluidoscope</h3><p>Comparez la fluidité d’une même scène à plusieurs fréquences d’images.</p><a download href="telechargements/Fluidoscope-1.0.0.exe">Télécharger pour Windows</a></div>
+  </article>
+<article data-group="1" data-device="PC">
+    <div class="visual poster" style="--tint:#655344"><img class="emblem" src="images/optimeo.png" alt="" loading="lazy"><span class="device">PC</span></div>
+    <div class="body"><span class="meta">Utilitaire</span><h3>Optimeo</h3><p>Un tableau de bord pour analyser et régler un PC Windows.</p><a download href="telechargements/Optimeo-Installation-1.1.1.exe">Télécharger pour Windows</a></div>
+  </article>
+<article data-group="1" data-device="PC">
+    <div class="visual poster" style="--tint:#815047"><span class="lettermark" aria-hidden="true">AP</span><span class="device">PC</span></div>
+    <div class="body"><span class="meta">Utilitaire</span><h3>Analyseur de performance</h3><p>Mesurez les performances d’un jeu Windows en temps réel avec PresentMon.</p></div>
+  </article>
+<article data-group="1" data-device="PC">
+    <div class="visual poster" style="--tint:#53526b"><span class="lettermark" aria-hidden="true">VS</span><span class="device">PC</span></div>
+    <div class="body"><span class="meta">Création vidéo</span><h3>AI Video Studio</h3><p>Un studio local de création d’images et d’animations sous Windows.</p></div>
+  </article>
+<article data-group="1" data-device="Mobile">
+    <div class="visual poster" style="--tint:#70666d"><span class="lettermark" aria-hidden="true">P</span><span class="device">Mobile</span></div>
+    <div class="body"><span class="meta">Sport</span><h3>Pulse</h3><p>Préparez vos séances de musculation et suivez vos charges et vos progrès.</p></div>
+  </article>
+<article data-group="1" data-device="Mobile et PC">
+    <div class="visual poster" style="--tint:#244a57"><span class="lettermark" aria-hidden="true">M</span><span class="device">Mobile et PC</span></div>
+    <div class="body"><span class="meta">Formation</span><h3>Myia</h3><p>Apprenez à utiliser l’IA avec des leçons courtes, des cas pratiques et des quiz.</p></div>
+  </article>
+<article data-group="1" data-device="Mobile">
+    <div class="visual poster" style="--tint:#33423e"><span class="lettermark" aria-hidden="true">D</span><span class="device">Mobile</span></div>
+    <div class="body"><span class="meta">Développement</span><h3>Droidelier</h3><p>Concevez des applications Android et préparez leur compilation.</p></div>
+  </article>
+<article data-group="1" data-device="Mobile">
+    <div class="visual poster" style="--tint:#655344"><span class="lettermark" aria-hidden="true">P</span><span class="device">Mobile</span></div>
+    <div class="body"><span class="meta">Organisation</span><h3>Projequipe</h3><p>Suivez vos projets, vos tâches et les décisions prises avec vos agents.</p></div>
+  </article>
+<article data-group="1" data-device="Web">
+    <div class="visual poster" style="--tint:#815047"><span class="lettermark" aria-hidden="true">RA</span><span class="device">Web</span></div>
+    <div class="body"><span class="meta">Musique</span><h3>Refrain · Atelier de Carlos</h3><p>Composez et retravaillez les paroles d’un refrain.</p></div>
+  </article>
+<article data-group="2" data-device="Web">
+    <div class="visual poster" style="--tint:#53526b"><span class="lettermark" aria-hidden="true">S</span><span class="device">Web</span></div>
+    <div class="body"><span class="meta">Guides de jeux</span><h3>Soluce</h3><p>Un guide interactif pour retrouver les quêtes et suivre sa progression dans The Witcher 3.</p></div>
+  </article>
+<article data-group="3" data-device="Vidéo">
+    <div class="visual poster" style="--tint:#70666d"><span class="lettermark" aria-hidden="true">OM</span><span class="device">Vidéo</span></div>
+    <div class="body"><span class="meta">MMA</span><h3>Outsider MMA</h3><p>Une chaîne qui explique le MMA aux spectateurs.</p><a href="https://youtube.com/@Outsidermma">Voir la chaîne</a></div>
+  </article>
+<article data-group="3" data-device="Vidéo">
+    <div class="visual poster" style="--tint:#244a57"><span class="lettermark" aria-hidden="true">MM</span><span class="device">Vidéo</span></div>
+    <div class="body"><span class="meta">Quiz</span><h3>La machine MMA</h3><p>Un projet de vidéos et de quiz sur le MMA.</p></div>
+  </article>
+<article data-group="3" data-device="Vidéo">
+    <div class="visual poster" style="--tint:#33423e"><span class="lettermark" aria-hidden="true">LC</span><span class="device">Vidéo</span></div>
+    <div class="body"><span class="meta">Contes</span><h3>Les contes Bonne nuit</h3><p>Une série de contes, dont l’épisode de Céleste la baleine des étoiles.</p></div>
+  </article>
+<article data-group="4" data-device="Mobile">
+    <div class="visual poster" style="--tint:#655344"><span class="lettermark" aria-hidden="true">DT</span><span class="device">Mobile</span></div>
+    <div class="body"><span class="meta">Prototype</span><h3>Droidelier test</h3><p>Une application Android de démonstration pour vérifier la compilation APK.</p></div>
+  </article>
+<article data-group="4" data-device="PC">
+    <div class="visual poster" style="--tint:#815047"><span class="lettermark" aria-hidden="true">MM</span><span class="device">PC</span></div>
+    <div class="body"><span class="meta">Archive</span><h3>MMA Manager v1</h3><p>Ancienne version locale de MMA Manager.</p></div>
+  </article></div>
+    <p id="empty" class="empty" hidden>Aucune création ne correspond à cette recherche.</p>
+  </section></main><footer><div class="wrap foot"><a class="brand" href="index.html"><img src="images/logo.svg" width="25" height="25" alt="">L’Atelier d’Oteka</a><a href="telechargements.html#creations">Téléchargements et versions</a></div></footer>
+<script src="js/catalogue.js"></script></body></html>

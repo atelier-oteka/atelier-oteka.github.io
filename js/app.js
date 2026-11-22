@@ -35,15 +35,7 @@
 
   /** Injecte les textes généraux définis dans SITE. */
   function remplirTextesSite() {
-    const s = typeof SITE !== "undefined" ? SITE : {};
-    const lier = (id, valeur) => { if (valeur) document.getElementById(id).textContent = valeur; };
-    lier("site-nom", s.nom);
-    lier("site-titre", s.titre);
-    lier("site-description", s.description);
-    lier("site-apropos", s.apropos);
-    lier("site-auteur", s.auteur);
-    if (s.nom) document.title = s.nom;
-    document.getElementById("annee").textContent = new Date().getFullYear();
+    document.getElementById("site-apropos").textContent = SITE.apropos;
   }
 
   /**
@@ -93,7 +85,7 @@
           <h3 class="carte__titre">${echapper(c.titre)}</h3>
           <p class="carte__desc">${echapper(c.description)}</p>
           ${Array.isArray(c.points) && c.points.length
-            ? `<ul class="carte__points">${c.points.map(p => `<li>${echapper(p)}</li>`).join("")}</ul>`
+            ? `<details class="features"><summary>Fonctionnalités</summary><ul class="carte__points">${c.points.map(p => `<li>${echapper(p)}</li>`).join("")}</ul></details>`
             : ""}
           <div class="carte__infos">${infos}</div>
           ${bouton}
@@ -128,6 +120,7 @@
     messageVide.textContent = liste.length === 0
       ? "Aucune création pour le moment. Revenez bientôt !"
       : "Aucun résultat pour cette recherche.";
+    boutonsFiltre.forEach(btn => btn.setAttribute("aria-pressed", String(btn.dataset.filtre === etat.filtre)));
     majCompteurs(liste);
   }
 
